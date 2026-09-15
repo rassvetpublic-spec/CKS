@@ -1,0 +1,15 @@
+version: v1
+kind: graveyard_item
+fields:
+  id: string
+  original_idea: string
+  rejection_reason: string
+  preserved_value: string
+  return_conditions: string
+  related_decisions:
+    type: list
+  status:
+    values:
+      - archived
+      - review_candidate
+      - restored
