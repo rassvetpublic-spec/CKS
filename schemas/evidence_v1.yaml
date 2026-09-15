@@ -1,0 +1,22 @@
+type: object
+required:
+  - id
+  - source
+  - description
+  - status
+properties:
+  id:
+    type: string
+  source:
+    type: string
+  description:
+    type: string
+  reference:
+    type: string
+  created_at:
+    type: string
+  status:
+    enum:
+      - draft
+      - validated
+      - archived
