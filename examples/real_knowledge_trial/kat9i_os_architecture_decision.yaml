@@ -1,0 +1,8 @@
+id: TRIAL-KAT9I-001
+type: decision
+source: KAT9I_OS
+score:
+  value_level: P0
+  confidence: 0.95
+  evidence_count: 3
+status: canon_candidate
