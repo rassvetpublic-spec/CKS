@@ -1,96 +1,234 @@
 # CKS 1.2 Scope
 
-## Purpose
+## Status
 
-CKS 1.2 is the transition from a knowledge model to controlled integration capabilities.
+Planning only. No implementation starts at this stage.
 
-The goal is not to replace the CKS core, but to add safe interaction layers around the stable knowledge foundation.
+## Current baseline
 
-## Stable foundation (from Bootstrap 1.0 and CKS 1.1)
+### CKS Bootstrap 1.0 — completed
 
-Already established:
-
+- Repository
 - Knowledge Object
-- Storage model
-- Version lifecycle
+- Storage
+- Lifecycle
+- Validation
+
+### CKS 1.1 — Release Candidate
+
 - References
-- Decision Records
-- Evidence traceability
+- Relationships
+- ADR Model
+- Decision Links
+- Evidence Links
+- Traceability
 
-These components remain the source of truth.
+The stable foundation remains:
 
-## Included in CKS 1.2
+```
+Knowledge Object
+        ↓
+Reference
+        ↓
+Decision
+        ↓
+Evidence
+        ↓
+Traceable Knowledge
+```
 
-### Context Passport
+---
+
+# CKS 1.2 Goal
+
+CKS 1.2 studies controlled interaction with external systems.
+
+It does not expand the CKS core into a runtime platform.
+
+Primary rule:
+
+```
+CKS stores knowledge.
+External systems use references and validated artifacts.
+```
+
+---
+
+# Analysis Areas
+
+## Context Passport
 
 Purpose:
-
-- describe external context packages;
-- identify origin;
+- describe origin and context of incoming artifacts;
 - preserve traceability.
 
-### Worker Manifest
+Classification:
+- metadata layer around knowledge objects.
+
+Dependencies:
+- context identification;
+- source tracking.
+
+Can be delayed:
+- yes.
+
+---
+
+## Worker Manifest
 
 Purpose:
+- describe external worker capabilities and limits.
 
-- describe worker capabilities;
-- define allowed interactions;
-- avoid uncontrolled knowledge writes.
+Classification:
+- external integration layer.
 
-### External Adapter Contract
+Dependencies:
+- worker identity;
+- permissions;
+- capability model.
+
+Can be delayed:
+- yes.
+
+Must not create runtime ownership inside CKS.
+
+---
+
+## External Adapter Contract
 
 Purpose:
+- define safe exchange between external systems and CKS.
 
-- connect external systems through validated exchange formats;
-- prevent raw context ingestion.
+Classification:
+- integration layer.
 
-### Import Pipeline
+Dependencies:
+- artifact formats;
+- validation boundaries.
+
+Can be delayed:
+- yes.
+
+---
+
+## Import Pipeline
 
 Purpose:
 
 ```
-External Package
-      ↓
+External Artifact
+        ↓
 Validation
-      ↓
+        ↓
 Candidate Object
-      ↓
+        ↓
 CKS Lifecycle
 ```
 
-## Excluded from CKS 1.2 core
+Classification:
+- integration and validation layer.
 
-Not part of the mandatory foundation:
+Dependencies:
+- ingestion rules;
+- error handling.
+
+Can be delayed:
+- yes.
+
+---
+
+## Advanced Validation
+
+Purpose:
+- extend quality checks beyond CKS 1.1 traceability.
+
+Classification:
+- possible core extension.
+
+Dependencies:
+- quality rules;
+- review criteria.
+
+Can be delayed:
+- partially.
+
+---
+
+## Promotion Workflow
+
+Purpose:
+- define controlled movement from candidate knowledge to accepted knowledge.
+
+Classification:
+- governance layer.
+
+Dependencies:
+- review policy;
+- evidence requirements.
+
+Can be delayed:
+- yes.
+
+Automatic promotion is not part of this stage.
+
+---
+
+# Architecture Audit
+
+## Runtime
+
+No CKS 1.1 element should contain execution logic.
+
+Result: PASS
+
+## KAT9I_OS dependency
+
+CKS may exchange artifacts with KAT9I_OS but does not depend on its runtime.
+
+Result: PASS
+
+## API and Agent layers
+
+No premature API platform or autonomous agent layer exists in the core.
+
+Result: PASS
+
+## Principle compliance
+
+```
+CKS stores knowledge.
+External systems use references.
+```
+
+Result: PASS
+
+---
+
+# CKS 1.2 Planning Sequence
+
+1. Collect real integration requirements.
+2. Define boundaries.
+3. Decide what belongs to CKS core.
+4. Define validation extensions.
+5. Implement only justified components.
+
+---
+
+# Deferred
+
+Explicitly postponed:
 
 - autonomous agents;
-- automatic canon promotion;
-- knowledge graph platform;
-- hidden runtime memory;
-- direct context dumps.
+- runtime execution;
+- hidden memory;
+- direct chat storage;
+- uncontrolled imports;
+- full knowledge graph platform.
 
-## Architecture rule
+---
 
-```
-External systems
-        ↓
-validated artifacts
-        ↓
-CKS objects
-```
+# Final Decision
 
-Not allowed:
+CKS 1.2 is a planning boundary, not an implementation phase.
 
-```
-External runtime memory
-        ↓
-CKS storage
-```
-
-## Success criteria
-
-CKS 1.2 is complete when:
-
-- external context can be imported safely;
-- provenance is preserved;
-- existing knowledge lifecycle remains unchanged;
-- integrations cannot bypass validation.
+The CKS core remains stable until real requirements justify expansion.
