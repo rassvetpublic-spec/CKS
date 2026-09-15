@@ -1,0 +1,7 @@
+id: PATTERN-0001
+type: pattern
+name: execution-knowledge-separation
+status: candidate
+source: KAT9I_OS integration analysis
+pattern: Keep runtime ownership outside CKS
+value: Prevent knowledge system from becoming executor memory
