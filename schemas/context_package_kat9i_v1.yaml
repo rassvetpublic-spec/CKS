@@ -1,0 +1,15 @@
+version: 1
+name: context_package_kat9i
+
+context_package:
+  id: string
+  source_system: KAT9I_OS
+  source_reference: string
+  created_at: datetime
+  split_mode: string
+  artifacts: []
+
+rules:
+  raw_runtime_state: false
+  raw_chat_dump: false
+  requires_validation: true
