@@ -1,0 +1,14 @@
+version: 1
+name: reference_v1
+
+reference:
+  id: string
+  source_object: string
+  target_object: string
+  relation_type: string
+  description: string
+
+allowed_relations:
+  - depends_on
+  - derived_from
+  - related_to
