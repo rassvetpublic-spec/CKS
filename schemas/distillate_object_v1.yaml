@@ -1,0 +1,23 @@
+schema: cks
+version: 1
+object: distillate_object
+purpose: Минимальный контракт передачи данных (Distillate) от Worker к KAT9I_OS
+
+required:
+  - version
+  - telemetry
+
+fields:
+  version: идентификатор версии схемы (e.g., v1)
+  telemetry: # Control Plane (Обязательно)
+    worker_id: идентификатор воркера (например, W-2)
+    task_id: каноничная ссылка на Issue / Задачу
+    rule_hash: хэш системного промпта/правил, при которых сгенерирован ответ
+    status: статус выполнения (PASS | FAIL | BLOCKED)
+  data_plane: # Knowledge Plane (Отсекается для приватных задач)
+    type: FACT | DECISION | RULE | OBSERVATION | TEMPORARY
+    payload: текстовое или структурированное описание дистиллята
+
+rules:
+  - privacy_enforcement: "Если задача имеет тег [SECURE], data_plane должен быть null или отсутствовать"
+  - immutability: "Объект является append-only (только для добавления) в сыром логе"
