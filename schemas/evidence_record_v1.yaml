@@ -1,0 +1,19 @@
+version: v1
+kind: evidence_record
+fields:
+  id: string
+  source: string
+  source_type:
+    values:
+      - document
+      - commit
+      - issue
+      - experiment
+      - external_reference
+  observed_fact: string
+  confidence:
+    values:
+      - low
+      - medium
+      - high
+  created_at: datetime
