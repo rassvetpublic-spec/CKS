@@ -1,0 +1,13 @@
+version: v1
+name: candidate_object
+fields:
+  id:
+    required: true
+  type:
+    required: true
+  source:
+    required: true
+  confidence:
+    required: true
+  status:
+    required: true
