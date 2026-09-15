@@ -1,0 +1,14 @@
+project:
+  lifecycle:
+    - BACKLOG
+    - ANALYSIS
+    - DESIGN
+    - IMPLEMENTATION
+    - QA
+    - ACCEPTED
+    - COMPLETED
+    - GRAVEYARD_REVIEW
+
+policies:
+  require_evidence_before_acceptance: true
+  require_decision_before_canon: true
