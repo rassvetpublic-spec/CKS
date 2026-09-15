@@ -1,0 +1,8 @@
+test: invalid_raw_context
+scenario: raw_memory_dump_rejection
+input:
+  source_system: KAT9I_OS
+  type: raw_context_dump
+expected:
+  validation: FAIL
+  reason: raw_context_not_allowed
