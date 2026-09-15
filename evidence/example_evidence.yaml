@@ -1,0 +1,5 @@
+id: evidence-001
+source: architecture_decision_discussion
+description: CKS must remain separate from execution systems
+reference: decision-001
+status: validated
