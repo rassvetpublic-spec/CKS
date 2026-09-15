@@ -1,0 +1,29 @@
+schema_version: v1
+status: discovery-draft
+
+object:
+  type: decision_memory
+  fields:
+    id: required
+    title: required
+    decision_type: required
+    status:
+      allowed:
+        - proposed
+        - accepted
+        - rejected
+        - superseded
+    rationale: required
+    evidence:
+      required: true
+    provenance:
+      required: true
+    revisit_policy:
+      required: false
+
+constraints:
+  - no_owner_field
+  - no_task_assignment
+  - no_runtime_state
+  - no_execution_status
+  - rejected_items_are_not_active_knowledge
