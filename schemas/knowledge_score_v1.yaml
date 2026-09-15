@@ -12,3 +12,16 @@ fields:
     type: number
   evidence_count:
     type: integer
+  usage_score:
+    type: number
+  freshness_score:
+    type: number
+  validation_state:
+    type: string
+    enum:
+      - draft
+      - validated
+      - canon_ready
+rules:
+  canon_requires_evidence: true
+  canon_requires_decision: true
