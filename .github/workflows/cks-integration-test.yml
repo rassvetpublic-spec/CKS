@@ -1,0 +1,15 @@
+name: CKS Integration Test
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  integration-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate CKS integration structure
+        run: |
+          test -f schemas/context_package_kat9i_v1.yaml
+          test -f scripts/import_context_package.py
