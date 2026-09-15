@@ -1,0 +1,5 @@
+schema: evidence_record_v1
+id: EVID-KAT9I-BOUNDARY-001
+type: architecture_review
+source: CKS_BOOTSTRAP_DISCUSSION
+status: validated
