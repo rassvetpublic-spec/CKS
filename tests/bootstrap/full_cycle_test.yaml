@@ -1,0 +1,15 @@
+test: bootstrap_full_cycle
+
+steps:
+  - create_knowledge_object
+  - validate_schema
+  - store_object
+  - read_object
+  - update_version
+  - archive_object
+
+expected: PASS
+
+forbidden:
+  - raw_context_storage
+  - runtime_memory_import
