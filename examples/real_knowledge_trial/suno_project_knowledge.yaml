@@ -1,0 +1,8 @@
+id: TRIAL-SUNO-001
+type: knowledge
+source: SUNO_RASSVET
+score:
+  value_level: P1
+  confidence: 0.85
+  evidence_count: 2
+status: accepted_candidate
