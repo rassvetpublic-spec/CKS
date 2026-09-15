@@ -1,0 +1,13 @@
+tests:
+  valid_reference:
+    source_object: knowledge-001
+    target_object: knowledge-002
+    result: pass
+
+  missing_target:
+    target_object: missing
+    result: fail
+
+  invalid_relation:
+    relation_type: unknown
+    result: fail
