@@ -1,0 +1,19 @@
+version: v1
+
+validation_result:
+  required:
+    - id
+    - checks
+    - result
+
+checks:
+  - structure
+  - evidence
+  - lifecycle
+  - canon
+
+result:
+  enum:
+    - PASS
+    - NEEDS_REVIEW
+    - FAIL
