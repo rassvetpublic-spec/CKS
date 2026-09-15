@@ -1,0 +1,14 @@
+version: 1
+adapter: kat9i_os
+purpose: map KAT9I_OS artifacts into CKS objects
+rules:
+  - source: context_package
+    target: candidate_object
+  - source: decision_artifact
+    target: decision_record
+  - source: evidence_artifact
+    target: evidence_record
+constraints:
+  raw_runtime_state: reject
+  hidden_memory: reject
+  direct_canon_update: reject
