@@ -1,0 +1,7 @@
+id: GRAVE-0001
+type: graveyard_item
+name: raw memory dump model
+status: archived
+reason_rejected: Creates passive storage instead of knowledge management
+valuable_part: Preserve extraction and audit mechanisms
+restore_condition: Only if controlled semantic filtering exists
