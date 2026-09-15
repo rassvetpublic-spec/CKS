@@ -3,9 +3,21 @@ name: artifact_contract
 
 artifact:
   id: string
-  type: decision|rule|evidence|document|idea
+  type: knowledge|decision|evidence|document|idea|rule|graveyard
   domain: string
-  status: draft|active|archived|graveyard
+  status: candidate|draft|active|accepted|canon|archived|graveyard
   source: string
   created_at: datetime
-  evidence: []
+  updated_at: datetime
+  evidence:
+    required_for_decision: true
+    references: []
+  decision_reference: string|null
+  lifecycle:
+    owner: string
+    review_required: false
+
+rules:
+  canon_requires_evidence: true
+  canon_requires_decision_reference: true
+  raw_context_as_artifact: false
