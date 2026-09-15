@@ -1,0 +1,7 @@
+version: 1
+
+policies:
+  canon_requires_evidence: true
+  raw_context_storage: false
+  external_memory_ownership: false
+  decision_history_required: true
