@@ -1,0 +1,7 @@
+test: high_value_knowledge
+input:
+  evidence_count: 5
+  confidence: 0.95
+  usage_score: 0.9
+expected:
+  validation_state: canon_ready
