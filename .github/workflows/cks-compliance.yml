@@ -1,0 +1,19 @@
+name: CKS Compliance
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate CKS structure
+        run: |
+          test -d protocols
+          test -d schemas
+          test -d docs
+          test -d evidence
+          test -d decisions
+          test -d graveyard
