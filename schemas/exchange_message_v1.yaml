@@ -1,0 +1,14 @@
+schema: cks_exchange_message_v1
+
+required:
+  - id
+  - source
+  - type
+  - evidence
+  - status
+
+types:
+  - knowledge
+  - decision
+  - evidence
+  - graveyard
