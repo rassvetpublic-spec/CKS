@@ -1,0 +1,36 @@
+version: 1
+status: automation_complete_for_non_decision_actions
+
+core:
+  changed: false
+  protected: true
+
+canon:
+  promoted: false
+  protected: true
+
+discovery:
+  cks_1_2:
+    status: prepared
+    promoted: false
+
+council:
+  v0_1:
+    technical_review: complete
+    human_gate: required
+
+checks:
+  evidence_index: complete
+  consistency_audit: complete
+  forbidden_fields_audit: complete
+  core_guard_audit: complete
+
+blocked_transitions:
+  - automatic_approval
+  - automatic_merge
+  - stable_promotion
+  - canon_promotion
+  - core_mutation
+
+next_state_change:
+  type: human_gate_decision
