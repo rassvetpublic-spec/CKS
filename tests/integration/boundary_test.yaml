@@ -1,0 +1,15 @@
+version: 1
+name: cks_kat9i_boundary_test
+
+checks:
+  - name: runtime_separation
+    expected: PASS
+    rule: KAT9I_OS_runtime_is_not_CKS_storage
+
+  - name: raw_context_block
+    expected: PASS
+    rule: raw_context_cannot_become_canon
+
+  - name: evidence_required
+    expected: PASS
+    rule: decision_requires_evidence
