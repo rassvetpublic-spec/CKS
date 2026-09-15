@@ -1,0 +1,14 @@
+version: 1
+object: knowledge_score
+fields:
+  value_level:
+    type: string
+    enum:
+      - P0
+      - P1
+      - P2
+      - P3
+  confidence:
+    type: number
+  evidence_count:
+    type: integer
