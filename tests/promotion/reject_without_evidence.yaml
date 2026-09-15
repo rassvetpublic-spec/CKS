@@ -1,0 +1,9 @@
+test: reject_without_evidence
+
+input:
+  candidate: knowledge_candidate_002
+  evidence: missing
+
+expected:
+  status: rejected
+  reason: evidence_required
