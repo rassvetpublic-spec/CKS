@@ -1,0 +1,15 @@
+schema: cks.promotion_request.v1
+
+promotion_request:
+  id: string
+  candidate_id: string
+  requested_by: string
+  target:
+    - accepted_knowledge
+    - canon
+  evidence_required: true
+  decision_reference_required: true
+  status:
+    - pending
+    - accepted
+    - rejected
