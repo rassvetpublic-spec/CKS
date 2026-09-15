@@ -1,0 +1,12 @@
+version: 1
+kind: audit_report
+fields:
+  audit_id: required
+  object_id: required
+  checks: required
+  result: required
+checks:
+  - source
+  - evidence
+  - canon_conflict
+  - lifecycle_state
