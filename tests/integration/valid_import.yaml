@@ -1,0 +1,9 @@
+test: valid_import
+scenario: KAT9I_OS_context_package
+input:
+  source_system: KAT9I_OS
+  type: context_package
+expected:
+  validation: PASS
+  artifact_creation: PASS
+  evidence_check: PASS
