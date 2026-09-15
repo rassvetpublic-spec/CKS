@@ -1,0 +1,18 @@
+version: v1
+kind: decision_record
+fields:
+  id: string
+  title: string
+  context: string
+  options:
+    type: list
+  selected_option: string
+  rationale: string
+  evidence_refs:
+    type: list
+  status:
+    values:
+      - draft
+      - accepted
+      - canon
+      - superseded
