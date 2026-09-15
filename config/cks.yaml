@@ -1,0 +1,12 @@
+version: 1
+name: CKS
+mode: independent
+purpose: knowledge_and_decision_system
+boundaries:
+  owns_runtime: false
+  owns_execution: false
+  stores_knowledge: true
+  stores_decisions: true
+lifecycle:
+  require_evidence_for_acceptance: true
+  protect_canon: true
