@@ -1,0 +1,5 @@
+schema: audit_report_v1
+id: AUDIT-MEMORY-DUMP-001
+object: raw_memory_dump_model
+result: REJECTED
+reason: CKS_is_not_raw_context_storage
