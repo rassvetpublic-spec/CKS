@@ -1,0 +1,14 @@
+test_suite: storage_lifecycle
+version: 1
+
+cases:
+  - name: create_object
+    expected: PASS
+  - name: read_object
+    expected: PASS
+  - name: update_version
+    expected: PASS
+  - name: archive_object
+    expected: PASS
+  - name: store_raw_context
+    expected: FAIL
