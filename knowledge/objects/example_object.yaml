@@ -1,0 +1,7 @@
+id: example-001
+type: pattern
+title: Example knowledge object
+content: Bootstrap 1.0 storage example
+source: CKS bootstrap test
+version: 1.0.0
+status: draft
