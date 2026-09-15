@@ -1,0 +1,24 @@
+audit:
+  id: CKS-FOUNDATION-AUDIT-001
+  version: v1
+
+scope:
+  - architecture
+  - protocols
+  - schemas
+  - knowledge_model
+  - decision_model
+
+checks:
+  architecture_boundary:
+    status: PASS
+  knowledge_sources:
+    status: PASS
+  evidence_requirements:
+    status: PASS
+  canon_protection:
+    status: PASS
+  raw_context_storage:
+    status: PASS
+
+result: PASS
