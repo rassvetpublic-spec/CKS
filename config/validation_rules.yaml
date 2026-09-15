@@ -1,0 +1,8 @@
+version: 1
+rules:
+  - id: evidence_required
+    description: accepted decisions require evidence
+  - id: canon_protection
+    description: canon objects cannot be overwritten silently
+  - id: source_tracking
+    description: knowledge objects require origin
