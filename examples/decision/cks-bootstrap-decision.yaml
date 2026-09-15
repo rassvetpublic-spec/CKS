@@ -1,0 +1,10 @@
+id: DEC-0001
+type: decision
+name: CKS bootstrap foundation
+status: accepted
+context: Establish independent Context Knowledge System layer
+decision: CKS owns knowledge, decisions and evidence, but not execution runtime
+evidence:
+  - repository-architecture
+  - protocols-created
+owner_layer: CKS
