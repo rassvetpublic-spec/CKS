@@ -1,0 +1,23 @@
+test_suite: knowledge_object_v1
+version: 1
+
+cases:
+  - name: valid_minimal_object
+    required:
+      - id
+      - type
+      - title
+      - source
+      - content
+      - version
+      - status
+    expected: PASS
+
+  - name: missing_source
+    missing:
+      - source
+    expected: FAIL
+
+  - name: unsupported_status
+    status: unknown
+    expected: FAIL
