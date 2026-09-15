@@ -1,0 +1,10 @@
+test: promote_candidate
+
+input:
+  candidate: knowledge_candidate_001
+  evidence: present
+  decision_reference: present
+
+expected:
+  status: accepted
+  target: accepted_knowledge
