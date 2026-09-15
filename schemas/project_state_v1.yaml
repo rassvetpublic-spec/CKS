@@ -1,0 +1,15 @@
+schema: project_state_v1
+
+states:
+  - BACKLOG
+  - ANALYSIS
+  - DESIGN
+  - IMPLEMENTATION
+  - QA
+  - ACCEPTED
+  - COMPLETED
+  - GRAVEYARD_REVIEW
+
+rules:
+  accepted_requires_evidence: true
+  canon_requires_decision_record: true
