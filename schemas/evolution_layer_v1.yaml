@@ -1,0 +1,28 @@
+schema_version: evolution_layer_v1
+status: discovery_draft
+purpose: >-
+  Capture justified proposals for future CKS evolution without automatic
+  architecture changes.
+
+fields:
+  id: required
+  trigger:
+    required: true
+    description: evidence or repeated pattern causing discovery
+  proposal_reference:
+    required: true
+  rationale:
+    required: true
+  evidence:
+    required: true
+  council_review:
+    required: true
+  human_gate:
+    required: true
+
+rules:
+  - discovery_is_not_canon: true
+  - no_automatic_core_changes: true
+  - proposal_requires_review: true
+  - runtime_state_forbidden: true
+  - owner_field_forbidden: true
