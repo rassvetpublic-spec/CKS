@@ -1,0 +1,21 @@
+tests:
+  - name: valid_evidence
+    input:
+      id: evidence-001
+      source: source
+      description: description
+      status: validated
+    expected: PASS
+
+  - name: missing_source
+    input:
+      id: evidence-002
+      description: description
+    expected: FAIL
+
+  - name: invalid_status
+    input:
+      id: evidence-003
+      source: source
+      status: unknown
+    expected: FAIL
