@@ -1,0 +1,7 @@
+test: low_confidence_knowledge
+input:
+  evidence_count: 0
+  confidence: 0.2
+  usage_score: 0.1
+expected:
+  validation_state: draft
