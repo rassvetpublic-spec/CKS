@@ -1,0 +1,16 @@
+version: 1
+name: agent_report
+
+fields:
+  agent:
+    required: true
+  task:
+    required: true
+  artifacts:
+    required: true
+  evidence:
+    required: false
+  decision_candidate:
+    required: false
+  status:
+    required: true
