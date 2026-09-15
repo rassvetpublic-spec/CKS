@@ -1,0 +1,19 @@
+test:
+  id: cks-1-1-traceability
+  name: full knowledge traceability
+
+flow:
+  - knowledge_object
+  - reference
+  - decision
+  - evidence
+
+expected:
+  traceable: true
+  source_required: true
+  decision_required: true
+
+forbidden:
+  - raw_context_as_knowledge
+  - missing_source
+  - direct_canon_without_validation
