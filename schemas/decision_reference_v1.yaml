@@ -1,0 +1,17 @@
+schema: cks_decision_reference_v1
+
+fields:
+  id:
+    required: true
+  decision_id:
+    required: true
+  related_object_id:
+    required: true
+  relation:
+    required: true
+    allowed:
+      - supports
+      - explains
+      - derived_from
+  description:
+    required: false
