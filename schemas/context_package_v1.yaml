@@ -1,0 +1,13 @@
+version: v1
+name: context_package
+fields:
+  id:
+    required: true
+  source:
+    required: true
+  content_type:
+    required: true
+  raw_reference:
+    required: true
+  split_mode:
+    required: true
