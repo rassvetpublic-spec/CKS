@@ -1,0 +1,9 @@
+agents:
+  analyst:
+    role: context_analysis
+  auditor:
+    role: validation
+  curator:
+    role: canon_management
+  adapter:
+    role: integration
