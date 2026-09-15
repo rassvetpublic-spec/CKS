@@ -1,0 +1,10 @@
+version: v1
+type: agent_task
+fields:
+  id: required
+  source: required
+  objective: required
+  constraints: optional
+  expected_artifacts: required
+  evidence_requirements: optional
+  status: required
