@@ -1,0 +1,8 @@
+test: regression_case
+purpose: prevent KAT9I_OS boundary regression
+input:
+  source: KAT9I_OS
+  type: raw_runtime_memory
+expected:
+  validation: fail
+  reason: raw_context_not_allowed
