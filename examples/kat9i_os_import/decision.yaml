@@ -1,0 +1,5 @@
+schema: decision_record_v1
+id: DEC-KAT9I-BOUNDARY-001
+title: Keep KAT9I_OS execution separate from CKS knowledge layer
+status: accepted
+evidence_required: true
