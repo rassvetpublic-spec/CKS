@@ -1,0 +1,21 @@
+name: CKS Validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate CKS structure
+        run: |
+          test -f README.md
+          test -d protocols
+          test -d schemas
+          test -d decisions
+          test -d evidence
+          test -d graveyard
