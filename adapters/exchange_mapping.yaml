@@ -1,0 +1,18 @@
+version: 1
+name: kat9i_cks_exchange_mapping
+
+mapping:
+  context_package:
+    source: KAT9I_OS
+    target: CKS
+    validation_required: true
+
+  decision:
+    requires:
+      - evidence
+      - source
+
+  canon:
+    requires:
+      - decision_reference
+      - evidence
