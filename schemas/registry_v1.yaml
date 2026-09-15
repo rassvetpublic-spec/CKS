@@ -1,0 +1,11 @@
+version: v1
+name: cks_registry
+objects:
+  - knowledge
+  - decision
+  - evidence
+  - graveyard
+
+rules:
+  require_source: true
+  require_status: true
