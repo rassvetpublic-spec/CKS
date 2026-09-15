@@ -1,0 +1,22 @@
+tests:
+  - name: valid_decision
+    input:
+      required:
+        - id
+        - title
+        - context
+        - decision
+        - source
+        - version
+        - status
+    expected: PASS
+
+  - name: missing_source
+    input:
+      source: null
+    expected: FAIL
+
+  - name: invalid_status
+    input:
+      status: unknown
+    expected: FAIL
