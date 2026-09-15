@@ -2,16 +2,26 @@ schema: cks
 version: 1
 object: knowledge_object
 
+purpose: minimal knowledge object for CKS Bootstrap 1.0
+
 required:
   - id
   - type
+  - title
   - source
   - content
+  - version
   - status
 
 fields:
   id: unique identifier
   type: fact|decision|pattern|hypothesis
+  title: human readable name
   source: origin reference
   content: knowledge payload
+  version: object version
   status: draft|accepted|archived
+
+rules:
+  bootstrap_scope_only: true
+  advanced_relations_disabled: true
