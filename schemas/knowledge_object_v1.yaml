@@ -1,0 +1,17 @@
+schema: cks
+version: 1
+object: knowledge_object
+
+required:
+  - id
+  - type
+  - source
+  - content
+  - status
+
+fields:
+  id: unique identifier
+  type: fact|decision|pattern|hypothesis
+  source: origin reference
+  content: knowledge payload
+  status: draft|accepted|archived
