@@ -1,0 +1,11 @@
+version: 1
+name: artifact_contract
+
+artifact:
+  id: string
+  type: decision|rule|evidence|document|idea
+  domain: string
+  status: draft|active|archived|graveyard
+  source: string
+  created_at: datetime
+  evidence: []
