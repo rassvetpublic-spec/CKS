@@ -1,0 +1,14 @@
+schema: canon_registry_v1
+
+required:
+  - id
+  - source
+  - decision_reference
+  - evidence
+  - status
+
+statuses:
+  - candidate
+  - accepted
+  - canon
+  - superseded
