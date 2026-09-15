@@ -1,0 +1,21 @@
+schema: cks
+version: 1
+object: distillate_object
+
+telemetry:
+  worker_id: W-DeepInvestigator-0
+  task_id: github-analysis-001
+  rule_hash: default-orchestrator-rule
+  status: PASS
+
+data_plane:
+  type: OBSERVATION
+  payload: >
+    Анализ паттернов ветвления проектов:
+    1. Жесткие правила AGENTS.md (MTD, QA, Scope) заставляют владельца обходить систему контроля версий (Git)
+       при возникновении "супер-идей" (СДВГ-импульсов).
+    2. Результат: массовое копирование папок (AGY1, AGY2, AG_0) вместо создания веток (branches) или worktree.
+    3. Выявлена архитектура Multi-Worker Distillate: KAT9I_OS выступает оркестратором (Fan-Out/Fan-In),
+       а база знаний CKS хранит JSON/YAML дистилляты, создаваемые воркерами по завершении задач.
+    4. Принято решение: внедрить "Протокол жесткого прерывания" (Hard Interruption) и использовать
+       Git Worktrees (spike/*) для легализации песочниц, отказавшись от ручного запуска 4-х окон Electron.
