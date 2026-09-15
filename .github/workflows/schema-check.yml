@@ -1,0 +1,14 @@
+name: Schema Check
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  schema-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check schema files
+        run: |
+          find schemas -name '*.yaml' -type f | sort
