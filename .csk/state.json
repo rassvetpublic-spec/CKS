@@ -1,0 +1,6 @@
+{
+  "version": "0.1.0",
+  "kind": "external_state_pointer",
+  "location": "${CKS_BRIDGE_HOME}/state",
+  "tracked_runtime_state": false
+}

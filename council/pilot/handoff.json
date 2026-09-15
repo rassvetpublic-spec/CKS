@@ -1,0 +1,17 @@
+{
+  "repository": "rassvetpublic-spec/CKS",
+  "task_id": "CKS-PILOT-0001",
+  "proposal_revision": 1,
+  "base_reference": "b4804ea15fef998f8dac26c926a4ff65c2c15cbe",
+  "pr_head": null,
+  "objective": "Проверить перенос контекста двух бесед в CKS без изменения CORE.",
+  "summary": "CORE FROZEN. В беседах есть PASS для KU-001 Decision и KU-003 Rule. В проверенной версии Git отдельные KU-файлы не найдены, а статус 1.1 — Release Candidate. Создан компактный пакет с источниками; кандидат решения остаётся draft.",
+  "delta": "Добавлены Bootstrap Context, QA_HISTORY, SOURCES и кандидат Decision Record. Схемы и существующие файлы сохранены.",
+  "findings": "P-001: разрешить расхождение STABLE/Release Candidate. P-002: найти артефакты KU-001/KU-003. P-003: нужна проверка конкретного коммита; локальная сверка не заменяет независимый QA.",
+  "references": [
+    "council/pilot/SOURCES.md",
+    "council/pilot/QA_HISTORY.md",
+    "council/reviews/CKS-PILOT-0001-review-r1.md",
+    "docs/CKS_ARCHITECTURE_GUARDRAILS.md"
+  ]
+}

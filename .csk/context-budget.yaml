@@ -1,0 +1,20 @@
+version: '0.1.0'
+# Лимиты символов измеримы локально; это не точный подсчёт токенов модели.
+full_chat_allowed: false
+max_packet_chars: 6500
+field_limits:
+  objective: 500
+  summary: 1200
+  delta: 2500
+  findings: 1600
+max_references: 8
+max_reference_chars: 240
+response_guidance:
+  architect_max_words: 350
+  reviewer_max_findings: 5
+  reviewer_max_words: 250
+overflow_policy: reject_and_narrow_scope
+unchanged_context_policy: reference_only
+stale_review_policy: invalidate
+cache_key_fields: [repository, task_id, proposal_revision, base_reference, pr_head]
+reuse_requires: identical_key_and_available_context
