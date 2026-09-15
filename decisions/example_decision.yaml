@@ -1,0 +1,7 @@
+id: decision-001
+title: CKS separate repository
+context: KAT9I_OS must not become knowledge storage
+decision: CKS remains an independent knowledge repository
+source: architecture_discussion
+version: 1.0.0
+status: accepted
