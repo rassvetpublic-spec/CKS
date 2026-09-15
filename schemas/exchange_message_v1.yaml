@@ -3,9 +3,17 @@ schema: cks_exchange_message_v1
 required:
   - id
   - source
+  - sender_type
   - type
   - evidence
   - status
+
+message_flow:
+  - task
+  - result
+  - knowledge
+  - decision
+  - evidence
 
 types:
   - knowledge
