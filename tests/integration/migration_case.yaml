@@ -1,0 +1,9 @@
+test: migration_case
+purpose: validate adapter migration flow
+input:
+  source: KAT9I_OS
+  type: context_package
+expected:
+  adapter: pass
+  validation: pass
+  target: cks_candidate_object
