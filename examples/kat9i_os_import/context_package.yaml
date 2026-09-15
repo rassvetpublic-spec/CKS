@@ -1,0 +1,6 @@
+schema: context_package_v1
+id: KAT9I-IMPORT-001
+source: KAT9I_OS
+content_type: architecture_context
+split_mode: CONTEXT_SPLIT
+status: candidate
