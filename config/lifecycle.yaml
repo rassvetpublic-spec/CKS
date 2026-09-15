@@ -1,0 +1,13 @@
+states:
+  - BACKLOG
+  - ANALYSIS
+  - DESIGN
+  - IMPLEMENTATION
+  - QA
+  - ACCEPTED
+  - COMPLETED
+  - GRAVEYARD_REVIEW
+
+rules:
+  require_evidence_before_acceptance: true
+  preserve_rejected_context: true
