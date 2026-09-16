@@ -1,20 +1,27 @@
-# CKS Knowledge Promotion Rules v1
+# Правила продвижения знаний CKS v1
 
-## Purpose
+## Назначение
 
-Define controlled promotion from candidate objects to accepted knowledge and canon.
+Определить управляемый переход от объектов-кандидатов к принятым знаниям и Canon (канону).
 
-## Lifecycle
+## Жизненный цикл
 
-Candidate
-  -> Evidence Check
-  -> Decision Review
-  -> Accepted Knowledge
-  -> Canon
+```text
+Candidate (кандидат)
+  → Evidence Check (проверка доказательств)
+  → Decision Review (проверка решения)
+  → Accepted Knowledge (принятое знание)
+  → Canon (канон)
+```
 
-## Rules
+## Правила
 
-- Candidate without evidence cannot become accepted knowledge.
-- Accepted knowledge without decision reference cannot become canon.
-- Raw context cannot be promoted directly.
-- Promotion must preserve source references.
+- Candidate (кандидат) без Evidence (доказательства) не может стать принятым знанием.
+- Accepted Knowledge (принятое знание) без ссылки на Decision (решение) не может стать Canon (каноном).
+- Raw Context (сырой контекст) нельзя продвигать напрямую.
+- Продвижение обязано сохранять ссылки на источники.
+- Автоматическая проверка не является Decision (решением) и не может самостоятельно повышать объект до Canon (канона).
+
+## Языковое правило
+
+Архитектурное объяснение ведётся на русском языке. Английские технические идентификаторы сохраняются только там, где они нужны для совместимости, и сопровождаются русским объяснением.
