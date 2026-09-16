@@ -16,15 +16,50 @@
     "по_тегам": {"$ref": "#/$defs/index"},
     "по_проектам": {"$ref": "#/$defs/index"},
     "по_уверенности": {"$ref": "#/$defs/index"},
-    "путь_материал_в_знание": {
+    "путь_материал_в_знание": {"$ref": "#/$defs/pipeline"},
+    "по_времени": {
+      "type": "object",
+      "properties": {
+        "по_месяцам": {"$ref": "#/$defs/index"},
+        "лента_событий": {"type": "array", "items": {"type": "object"}},
+        "без_даты": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": true
+    },
+    "по_связности": {
+      "type": "object",
+      "properties": {
+        "группы": {"$ref": "#/$defs/index"},
+        "объекты": {"type": "object", "additionalProperties": {"type": "object"}}
+      },
+      "additionalProperties": true
+    },
+    "по_проблемам": {"$ref": "#/$defs/index"},
+    "по_происхождению": {
+      "type": "object",
+      "additionalProperties": {"type": "object"}
+    },
+    "воронка_материал_в_знание": {
+      "type": "object",
+      "properties": {
+        "objects_total": {"type": "integer", "minimum": 0},
+        "stages": {"$ref": "#/$defs/pipeline_with_share"},
+        "knowledge_or_canon": {"type": "integer", "minimum": 0},
+        "input": {"type": "integer", "minimum": 0},
+        "knowledge_share": {"type": "number", "minimum": 0, "maximum": 1}
+      },
+      "additionalProperties": true
+    },
+    "проекты_как_проекции": {
       "type": "object",
       "additionalProperties": {
         "type": "object",
-        "required": ["count", "objects"],
         "properties": {
-          "count": {"type": "integer", "minimum": 0},
-          "objects": {"type": "array", "items": {"type": "string"}}
-        }
+          "objects": {"type": "array", "items": {"type": "string"}},
+          "по_статусам": {"$ref": "#/$defs/index"},
+          "по_кластерам": {"$ref": "#/$defs/index"}
+        },
+        "additionalProperties": true
       }
     }
   },
@@ -34,6 +69,31 @@
       "additionalProperties": {
         "type": "array",
         "items": {"type": "string"}
+      }
+    },
+    "pipeline": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["count", "objects"],
+        "properties": {
+          "count": {"type": "integer", "minimum": 0},
+          "objects": {"type": "array", "items": {"type": "string"}}
+        },
+        "additionalProperties": true
+      }
+    },
+    "pipeline_with_share": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["count", "share", "objects"],
+        "properties": {
+          "count": {"type": "integer", "minimum": 0},
+          "share": {"type": "number", "minimum": 0, "maximum": 1},
+          "objects": {"type": "array", "items": {"type": "string"}}
+        },
+        "additionalProperties": true
       }
     }
   },
