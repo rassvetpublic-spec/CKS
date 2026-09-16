@@ -4,8 +4,12 @@ on:
   push:
     paths:
       - 'tools/cks_knowledge_runtime.py'
+      - 'tools/cks_knowledge_state_machine.py'
+      - 'tools/cks_obsidian_export.py'
+      - 'tools/cks_dynamic_views.py'
       - 'tools/cks_knowledge_intelligence.py'
       - 'tools/cks_self_audit.py'
+      - 'validators/lifecycle_guard.py'
       - 'schemas/cks-knowledge-object.schema.json'
       - 'schemas/cks-knowledge-view.schema.json'
       - 'obsidian/**'
@@ -13,12 +17,20 @@ on:
       - 'docs/ГЛОССАРИЙ.md'
       - 'decisions/ADR-0002-knowledge-centric-runtime.md'
       - 'tests/test_knowledge_runtime_intelligence.py'
+      - 'tests/test_cks_knowledge_runtime_stage2.py'
+      - 'tests/test_cks_obsidian_stage3.py'
+      - 'tests/test_cks_dynamic_views_stage4.py'
+      - 'tests/test_cks_knowledge_intelligence_stage5.py'
       - '.github/workflows/cks-knowledge-runtime-intelligence.yml'
   pull_request:
     paths:
       - 'tools/cks_knowledge_runtime.py'
+      - 'tools/cks_knowledge_state_machine.py'
+      - 'tools/cks_obsidian_export.py'
+      - 'tools/cks_dynamic_views.py'
       - 'tools/cks_knowledge_intelligence.py'
       - 'tools/cks_self_audit.py'
+      - 'validators/lifecycle_guard.py'
       - 'schemas/cks-knowledge-object.schema.json'
       - 'schemas/cks-knowledge-view.schema.json'
       - 'obsidian/**'
@@ -26,6 +38,10 @@ on:
       - 'docs/ГЛОССАРИЙ.md'
       - 'decisions/ADR-0002-knowledge-centric-runtime.md'
       - 'tests/test_knowledge_runtime_intelligence.py'
+      - 'tests/test_cks_knowledge_runtime_stage2.py'
+      - 'tests/test_cks_obsidian_stage3.py'
+      - 'tests/test_cks_dynamic_views_stage4.py'
+      - 'tests/test_cks_knowledge_intelligence_stage5.py'
       - '.github/workflows/cks-knowledge-runtime-intelligence.yml'
 
 permissions:
@@ -33,7 +49,7 @@ permissions:
 
 jobs:
   knowledge-runtime:
-    name: Проверка рабочего контура знаний
+    name: Проверка этапов 2–5 рабочего контура знаний
     runs-on: ubuntu-latest
     steps:
       - name: Получить репозиторий
@@ -44,14 +60,30 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Проверить синтаксис модулей
+      - name: Проверить синтаксис модулей этапов 2–5
         run: |
           python -m py_compile tools/cks_knowledge_runtime.py
+          python -m py_compile tools/cks_knowledge_state_machine.py
+          python -m py_compile tools/cks_obsidian_export.py
+          python -m py_compile tools/cks_dynamic_views.py
           python -m py_compile tools/cks_knowledge_intelligence.py
           python -m py_compile tools/cks_self_audit.py
+          python -m py_compile validators/lifecycle_guard.py
 
-      - name: Запустить тесты рабочего контура и аналитики
-        run: python -m unittest tests/test_knowledge_runtime_intelligence.py -v
+      - name: Этап 2 — рабочий контур и состояния
+        run: python -m unittest discover -s tests -p 'test_cks_knowledge_runtime_stage2.py' -v
+
+      - name: Этап 3 — Obsidian и графическое представление
+        run: python -m unittest discover -s tests -p 'test_cks_obsidian_stage3.py' -v
+
+      - name: Этап 4 — динамические представления
+        run: python -m unittest discover -s tests -p 'test_cks_dynamic_views_stage4.py' -v
+
+      - name: Базовая регрессия runtime и intelligence
+        run: python -m unittest discover -s tests -p 'test_knowledge_runtime_intelligence.py' -v
+
+      - name: Этап 5 — структурная аналитика знаний
+        run: python -m unittest discover -s tests -p 'test_cks_knowledge_intelligence_stage5.py' -v
 
       - name: Выполнить самопроверку CKS
         run: python tools/cks_self_audit.py --root . --report reports/knowledge-runtime-self-audit.json
