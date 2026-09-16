@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CKS Document Metadata",
+  "type": "object",
+  "required": ["id", "type", "status", "owner"],
+  "properties": {
+    "id": {"type": "string"},
+    "type": {"enum": ["canon", "research", "proposal", "template", "report", "deprecated"]},
+    "status": {"enum": ["draft", "review", "active", "superseded", "archived"]},
+    "owner": {"type": "string"},
+    "supersedes": {"type": "array"}
+  }
+}
