@@ -2,6 +2,14 @@
 
 ## System Specification v1.0
 
+## Status
+
+Experimental parallel project.
+
+CKS is a donor project for researching knowledge, decision and context management mechanisms.
+
+CKS is not SSOT for KAT9I_OS and does not automatically change KAT9I_OS decisions or canon.
+
 ## 1. Purpose
 
 CKS is an independent Context Knowledge System for managing validated knowledge, decisions, evidence and historical context.
@@ -58,39 +66,18 @@ KAT9I_OS remains responsible for:
 - workflows;
 - runtime processes.
 
-CKS provides:
+CKS provides research patterns for:
 
 - validated knowledge;
 - architectural decisions;
 - reusable patterns;
 - evidence-backed context.
 
-## 6. Knowledge Lifecycle
+Adoption requires separate review.
 
-```text
-Candidate
- ↓
-Review
- ↓
-Accepted
- ↓
-Canon
-```
+## 6. Context Split Modes
 
-## 7. Decision Lifecycle
-
-Every important decision contains:
-
-- context;
-- alternatives;
-- selected solution;
-- reasoning;
-- evidence;
-- status.
-
-## 8. Context Split
-
-CKS supports:
+CKS researches:
 
 - SPLIT
 - AUDIT
@@ -101,13 +88,13 @@ CKS supports:
 - MERGE
 - CANON CHECK
 
-## 9. Storage Principle
+## 7. Storage Principle
 
-CKS has its own storage because knowledge lifecycle differs from execution lifecycle.
+CKS may have its own storage layer because knowledge lifecycle differs from execution lifecycle.
 
-The storage contains structured objects, not uncontrolled memory dumps.
+Storage contains structured objects, not uncontrolled memory dumps.
 
-## 10. Future Extensions
+## 8. Future Extensions
 
 - agent contracts;
 - external adapters;
