@@ -1,0 +1,13 @@
+name: CKS v1.6 Intelligence Runtime
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  intelligence-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run governance intelligence checks
+        run: python tools/cks_v1_6_intelligence_runtime.py
