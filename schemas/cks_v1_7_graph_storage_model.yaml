@@ -1,14 +1,48 @@
 version: v1.7
 kind: GraphStorageModel
+schema_version: "2.0"
+authority: derived_index_only
 
 node:
   id: string
   type: string
-  lifecycle: string
+  project: string_or_null
+  lifecycle: string_or_null
   metadata: object
 
 edge:
+  id: stable_relation_id
+  version: integer
   source: node_id
   target: node_id
   relation: string
   evidence: list
+  metadata: object
+  history: list
+
+relation_history:
+  description_ru: "Неудаляемый журнал создания, изменения и удаления связей графа."
+  event_fields:
+    - edge_id
+    - event
+    - version
+    - source
+    - target
+    - relation
+    - reason
+    - changed_by
+    - timestamp
+    - changes
+
+graph_migration:
+  current_schema_version: "2.0"
+  supported_input_versions:
+    - "1.0"
+    - "2.0"
+  rule_ru: "Миграция не меняет входной объект и не повышает данные до Canon."
+
+graph_recovery:
+  snapshot_version: "1.0"
+  integrity: sha256
+  kind: cks_graph_recovery_snapshot
+  rule_ru: "Восстановление допускается только после проверки хэша и целостности графа."
