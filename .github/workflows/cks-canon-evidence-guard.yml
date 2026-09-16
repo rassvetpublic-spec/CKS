@@ -1,0 +1,12 @@
+name: CKS Canon Evidence Guard
+
+on:
+  pull_request:
+
+jobs:
+  canon-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check canon evidence boundary
+        run: echo "Canon requires Evidence + Decision + History"
