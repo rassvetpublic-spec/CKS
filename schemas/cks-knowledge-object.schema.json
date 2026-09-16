@@ -1,16 +1,162 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "CKS Knowledge Object",
+  "$id": "https://cks.local/schemas/cks-knowledge-object.schema.json",
+  "title": "CKS — единая схема объекта знания",
+  "description": "Технический контракт объекта знания CKS. Человеческие описания и представления ведутся на русском языке; технические идентификаторы сохраняются на английском для совместимости.",
   "type": "object",
   "required": ["id", "type", "status", "owner", "lifecycle", "relations", "evidence", "history"],
+  "additionalProperties": true,
   "properties": {
-    "id": {"type": "string", "pattern": "^CKS-[A-Z]+-[0-9]+$"},
-    "type": {"enum": ["knowledge", "evidence", "decision", "proposal", "rule", "process", "experiment"]},
-    "status": {"enum": ["draft", "review", "active", "superseded", "archived"]},
-    "owner": {"type": "string"},
-    "lifecycle": {"enum": ["research", "validation", "adoption", "frozen", "archive"]},
-    "relations": {"type": "array"},
-    "evidence": {"type": "array"},
-    "history": {"type": "array"}
+    "id": {
+      "type": "string",
+      "pattern": "^CKS-[A-Z]+-[0-9]+$",
+      "description": "Стабильный идентификатор объекта."
+    },
+    "title": {
+      "type": "string",
+      "description": "Человеческое название объекта знания."
+    },
+    "name": {
+      "type": "string",
+      "description": "Совместимое альтернативное поле названия."
+    },
+    "type": {
+      "enum": [
+        "knowledge", "evidence", "decision", "proposal", "rule", "process",
+        "experiment", "idea", "question", "hypothesis", "source", "observation",
+        "intuition", "cluster", "project_view"
+      ],
+      "description": "Тип объекта знания."
+    },
+    "version": {
+      "type": ["string", "integer"],
+      "description": "Версия узла; история версий хранится отдельно в history."
+    },
+    "status": {
+      "enum": [
+        "raw", "captured", "normalized", "deduplicated", "clustered", "researched",
+        "understood", "connected", "validated", "knowledge", "canonical", "evolving",
+        "disputed", "superseded", "archived", "rejected",
+        "draft", "review", "active"
+      ],
+      "description": "Состояние развития знания. draft/review/active оставлены для обратной совместимости."
+    },
+    "owner": {
+      "type": "string",
+      "description": "Ответственный владелец объекта."
+    },
+    "lifecycle": {
+      "enum": ["research", "validation", "adoption", "frozen", "archive", "development", "knowledge"],
+      "description": "Крупная стадия жизненного цикла; status задаёт более детальное состояние."
+    },
+    "clusters": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true,
+      "default": [],
+      "description": "Кластеры — тематические группы знаний."
+    },
+    "tags": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true,
+      "default": [],
+      "description": "Теги — лёгкие признаки и фасеты объекта."
+    },
+    "projects": {
+      "type": "array",
+      "items": {"type": "string"},
+      "uniqueItems": true,
+      "default": [],
+      "description": "Проекты как проекции графа знаний, а не контейнеры файлов."
+    },
+    "relations": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "oneOf": [
+          {"type": "string"},
+          {
+            "type": "object",
+            "required": ["target", "type"],
+            "properties": {
+              "id": {"type": "string"},
+              "target": {"type": "string"},
+              "type": {"type": "string"},
+              "reason": {"type": "string"},
+              "evidence": {"type": "array", "items": {"type": "string"}},
+              "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+              "created_at": {"type": "string"},
+              "updated_at": {"type": "string"},
+              "history": {"type": "array", "items": {"type": "object"}}
+            },
+            "additionalProperties": true
+          }
+        ]
+      },
+      "description": "Связи объекта. Связь может иметь собственную историю, основание и уверенность."
+    },
+    "evidence": {
+      "type": "array",
+      "items": {"type": ["string", "object"]},
+      "default": [],
+      "description": "Ссылки на доказательства; сами доказательства остаются отдельными объектами."
+    },
+    "traceability": {
+      "type": ["array", "object"],
+      "default": [],
+      "description": "Производные ссылки происхождения знания."
+    },
+    "history": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "oneOf": [
+          {"type": "string"},
+          {
+            "type": "object",
+            "properties": {
+              "version": {"type": ["string", "integer"]},
+              "status": {"type": "string"},
+              "timestamp": {"type": "string"},
+              "reason": {"type": "string"},
+              "changed_by": {"type": "string"},
+              "source": {"type": "string"}
+            },
+            "additionalProperties": true
+          }
+        ]
+      },
+      "description": "История развития узла и смены состояний."
+    },
+    "signals": {
+      "type": "object",
+      "default": {},
+      "properties": {
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "importance": {"type": "number", "minimum": 0, "maximum": 1},
+        "novelty": {"type": "number", "minimum": 0, "maximum": 1},
+        "uncertainty": {"type": "number", "minimum": 0, "maximum": 1},
+        "intuition": {"type": ["string", "array"], "items": {"type": "string"}}
+      },
+      "additionalProperties": true,
+      "description": "Диагностические и человеческие сигналы. Интуиция не является решением."
+    },
+    "obsidian": {
+      "type": "object",
+      "default": {},
+      "properties": {
+        "aliases": {"type": "array", "items": {"type": "string"}},
+        "cssclasses": {"type": "array", "items": {"type": "string"}},
+        "folder": {"type": "string"},
+        "publish": {"type": "boolean"}
+      },
+      "additionalProperties": true,
+      "description": "Параметры производного Markdown-представления для Obsidian."
+    },
+    "source": {
+      "type": ["string", "object"],
+      "description": "Источник исходного материала."
+    }
   }
 }
