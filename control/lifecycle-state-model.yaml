@@ -1,4 +1,7 @@
-lifecycle:
+version: 2
+
+system_lifecycle:
+  description_ru: "Крупный жизненный цикл архитектурных и управляющих объектов CKS."
   states:
     - discovered
     - researched
@@ -9,6 +12,24 @@ lifecycle:
     - deprecated
     - archived
 
+knowledge_runtime:
+  description_ru: "Детальный жизненный цикл объектов знаний."
+  status_source: "schemas/cks-knowledge-object.schema.json#/properties/status/enum"
+  runtime_source: "tools/cks_knowledge_runtime.py"
+  transition_validator: "tools/cks_knowledge_state_machine.py"
+  compatibility_aliases:
+    draft: raw
+    review: validated
+    active: knowledge
+  principles:
+    - "Сырой материал не может напрямую стать каноном."
+    - "Переход в canonical требует доказательства и ссылки на решение."
+    - "archived и rejected являются терминальными статусами."
+    - "Обратный переход требует объяснения причины."
+    - "Проверка перехода не изменяет объект автоматически."
+
 rules:
   proposed_is_not_canonical: true
   archived_is_read_only: true
+  automation_is_not_decision: true
+  graph_is_not_ssot: true
