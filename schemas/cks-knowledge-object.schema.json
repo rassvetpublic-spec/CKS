@@ -2,13 +2,15 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "CKS Knowledge Object",
   "type": "object",
-  "required": ["id","type","cluster","status","relations"],
+  "required": ["id", "type", "status", "owner", "lifecycle", "relations", "evidence", "history"],
   "properties": {
-    "id": {"type":"string"},
-    "type": {"type":"string"},
-    "cluster": {"type":"string"},
-    "status": {"type":"string"},
-    "owner": {"type":"string"},
-    "relations": {"type":"array"}
+    "id": {"type": "string", "pattern": "^CKS-[A-Z]+-[0-9]+$"},
+    "type": {"enum": ["knowledge", "evidence", "decision", "proposal", "rule", "process", "experiment"]},
+    "status": {"enum": ["draft", "review", "active", "superseded", "archived"]},
+    "owner": {"type": "string"},
+    "lifecycle": {"enum": ["research", "validation", "adoption", "frozen", "archive"]},
+    "relations": {"type": "array"},
+    "evidence": {"type": "array"},
+    "history": {"type": "array"}
   }
 }
