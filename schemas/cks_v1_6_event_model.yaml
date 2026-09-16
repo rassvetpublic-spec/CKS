@@ -1,0 +1,12 @@
+version: v1.6
+name: CKS Intelligence Event Model
+event:
+  id: string
+  type: string
+  timestamp: datetime
+  source: string
+  object_id: string
+  payload: object
+rules:
+  - events describe state changes
+  - events do not modify canon automatically
