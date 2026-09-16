@@ -1,0 +1,20 @@
+{
+  "entities": [
+    "GAP",
+    "Issue",
+    "Evidence",
+    "Proposal",
+    "Decision",
+    "Change",
+    "History"
+  ],
+  "relations": {
+    "GAP": ["Issue"],
+    "Issue": ["Evidence"],
+    "Evidence": ["Proposal"],
+    "Proposal": ["Decision"],
+    "Decision": ["Change"],
+    "Change": ["History"]
+  },
+  "core_change_requires": ["Evidence", "Decision", "History"]
+}
