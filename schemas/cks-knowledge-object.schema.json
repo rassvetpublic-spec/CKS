@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CKS Knowledge Object",
+  "type": "object",
+  "required": ["id","type","cluster","status","relations"],
+  "properties": {
+    "id": {"type":"string"},
+    "type": {"type":"string"},
+    "cluster": {"type":"string"},
+    "status": {"type":"string"},
+    "owner": {"type":"string"},
+    "relations": {"type":"array"}
+  }
+}
