@@ -1,0 +1,65 @@
+name: CKS — рабочий контур и аналитика знаний
+
+on:
+  push:
+    paths:
+      - 'tools/cks_knowledge_runtime.py'
+      - 'tools/cks_knowledge_intelligence.py'
+      - 'tools/cks_self_audit.py'
+      - 'schemas/cks-knowledge-object.schema.json'
+      - 'schemas/cks-knowledge-view.schema.json'
+      - 'obsidian/**'
+      - 'docs/CKS_KNOWLEDGE_RUNTIME_AND_INTELLIGENCE_RU.md'
+      - 'docs/ГЛОССАРИЙ.md'
+      - 'decisions/ADR-0002-knowledge-centric-runtime.md'
+      - 'tests/test_knowledge_runtime_intelligence.py'
+      - '.github/workflows/cks-knowledge-runtime-intelligence.yml'
+  pull_request:
+    paths:
+      - 'tools/cks_knowledge_runtime.py'
+      - 'tools/cks_knowledge_intelligence.py'
+      - 'tools/cks_self_audit.py'
+      - 'schemas/cks-knowledge-object.schema.json'
+      - 'schemas/cks-knowledge-view.schema.json'
+      - 'obsidian/**'
+      - 'docs/CKS_KNOWLEDGE_RUNTIME_AND_INTELLIGENCE_RU.md'
+      - 'docs/ГЛОССАРИЙ.md'
+      - 'decisions/ADR-0002-knowledge-centric-runtime.md'
+      - 'tests/test_knowledge_runtime_intelligence.py'
+      - '.github/workflows/cks-knowledge-runtime-intelligence.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  knowledge-runtime:
+    name: Проверка рабочего контура знаний
+    runs-on: ubuntu-latest
+    steps:
+      - name: Получить репозиторий
+        uses: actions/checkout@v4
+
+      - name: Настроить Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Проверить синтаксис модулей
+        run: |
+          python -m py_compile tools/cks_knowledge_runtime.py
+          python -m py_compile tools/cks_knowledge_intelligence.py
+          python -m py_compile tools/cks_self_audit.py
+
+      - name: Запустить тесты рабочего контура и аналитики
+        run: python -m unittest tests/test_knowledge_runtime_intelligence.py -v
+
+      - name: Выполнить самопроверку CKS
+        run: python tools/cks_self_audit.py --root . --report reports/knowledge-runtime-self-audit.json
+
+      - name: Опубликовать диагностический отчёт
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cks-knowledge-runtime-self-audit
+          path: reports/knowledge-runtime-self-audit.json
+          if-no-files-found: warn
