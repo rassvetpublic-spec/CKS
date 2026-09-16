@@ -1,0 +1,16 @@
+id: CKS-OBJ-V14-001
+type: rule
+version: 1.4
+status: active
+owner: cks-core
+lifecycle: reviewed
+evidence:
+  - id: CKS-EVD-V14-001
+history:
+  - event: migrated
+    from: v1.3
+relations:
+  - target: CKS-DEC-V14-001
+    type: supports
+traceability:
+  source: migration-test
