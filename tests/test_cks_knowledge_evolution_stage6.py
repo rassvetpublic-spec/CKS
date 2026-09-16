@@ -14,6 +14,7 @@ if str(TOOLS) not in sys.path:
 
 from cks_knowledge_evolution import KnowledgeEvolution
 from cks_knowledge_runtime import KnowledgeRuntime
+from cks_version_change_analyzer import compare_versions
 
 
 class KnowledgeEvolutionStage6Tests(unittest.TestCase):
@@ -186,8 +187,6 @@ class KnowledgeEvolutionStage6Tests(unittest.TestCase):
         invalid["records"][0]["signals"] = {"confidence": 2.0}
         payload = {key: value for key, value in invalid.items() if key not in {"sha256", "authority"}}
 
-        # Пересчитываем корректный hash для намеренно невалидного содержимого:
-        # восстановление обязано упасть уже на runtime-валидации, а не на hash.
         import hashlib
         import json
 
@@ -215,6 +214,16 @@ class KnowledgeEvolutionStage6Tests(unittest.TestCase):
         self.assertEqual(diff["changed"][0]["id"], "CKS-KNW-610")
         fields = {item["field"] for item in diff["changed"][0]["fields"]}
         self.assertEqual(fields, {"status"})
+
+    def test_version_change_analyzer_uses_real_diff(self) -> None:
+        old = {"id": "CKS-KNW-620", "status": "knowledge", "title": "A"}
+        new = {"id": "CKS-KNW-620", "status": "evolving", "title": "A"}
+        diff = compare_versions(old, new)
+        self.assertEqual(diff["status"], "CHANGED")
+        self.assertEqual(diff["added"], [])
+        self.assertEqual(diff["removed"], [])
+        self.assertEqual(diff["changed"][0]["id"], "CKS-KNW-620")
+        self.assertEqual({item["field"] for item in diff["changed"][0]["fields"]}, {"status"})
 
     def test_evidence_reference_normalization(self) -> None:
         record = {
