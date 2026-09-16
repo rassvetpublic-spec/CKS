@@ -19,6 +19,7 @@ on:
       - 'validators/lifecycle_guard.py'
       - 'schemas/cks-knowledge-object.schema.json'
       - 'schemas/cks-knowledge-view.schema.json'
+      - 'schemas/cks_v1_7_graph_storage_model.yaml'
       - 'obsidian/**'
       - 'docs/CKS_KNOWLEDGE_RUNTIME_AND_INTELLIGENCE_RU.md'
       - 'docs/ГЛОССАРИЙ.md'
@@ -30,6 +31,7 @@ on:
       - 'tests/test_cks_knowledge_intelligence_stage5.py'
       - 'tests/test_cks_knowledge_evolution_stage6.py'
       - 'tests/test_cks_full_self_audit_stage7.py'
+      - 'tests/test_cks_graph_evolution_stage_b.py'
       - '.github/workflows/cks-knowledge-runtime-intelligence.yml'
   pull_request:
     paths:
@@ -49,6 +51,7 @@ on:
       - 'validators/lifecycle_guard.py'
       - 'schemas/cks-knowledge-object.schema.json'
       - 'schemas/cks-knowledge-view.schema.json'
+      - 'schemas/cks_v1_7_graph_storage_model.yaml'
       - 'obsidian/**'
       - 'docs/CKS_KNOWLEDGE_RUNTIME_AND_INTELLIGENCE_RU.md'
       - 'docs/ГЛОССАРИЙ.md'
@@ -60,6 +63,7 @@ on:
       - 'tests/test_cks_knowledge_intelligence_stage5.py'
       - 'tests/test_cks_knowledge_evolution_stage6.py'
       - 'tests/test_cks_full_self_audit_stage7.py'
+      - 'tests/test_cks_graph_evolution_stage_b.py'
       - '.github/workflows/cks-knowledge-runtime-intelligence.yml'
 
 permissions:
@@ -67,7 +71,7 @@ permissions:
 
 jobs:
   knowledge-runtime:
-    name: Проверка этапов 2–7 рабочего контура знаний
+    name: Проверка этапов 2–7 и графового этапа B
     runs-on: ubuntu-latest
     steps:
       - name: Получить репозиторий
@@ -78,7 +82,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Проверить синтаксис модулей этапов 2–7
+      - name: Проверить синтаксис рабочих модулей
         run: |
           python -m py_compile tools/cks_knowledge_runtime.py
           python -m py_compile tools/cks_knowledge_state_machine.py
@@ -110,11 +114,14 @@ jobs:
       - name: Этап 5 — структурная аналитика знаний
         run: python -m unittest discover -s tests -p 'test_cks_knowledge_intelligence_stage5.py' -v
 
-      - name: Этап 6 — эволюция, миграция и восстановление
+      - name: Этап 6 — эволюция, миграция и восстановление знаний
         run: python -m unittest discover -s tests -p 'test_cks_knowledge_evolution_stage6.py' -v
 
       - name: Этап 7 — полный самоаудит и интегральная регрессия
         run: python -m unittest discover -s tests -p 'test_cks_full_self_audit_stage7.py' -v
+
+      - name: Этап B — история связей, миграция и восстановление графа
+        run: python -m unittest discover -s tests -p 'test_cks_graph_evolution_stage_b.py' -v
 
       - name: Выполнить самопроверку CKS
         run: python tools/cks_self_audit.py --root . --report reports/knowledge-runtime-self-audit.json
