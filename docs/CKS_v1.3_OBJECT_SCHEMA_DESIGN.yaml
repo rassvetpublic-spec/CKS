@@ -1,0 +1,21 @@
+objects:
+  knowledge_object:
+    requires:
+      - id
+      - source
+      - history
+  evidence_record:
+    requires:
+      - id
+      - reference
+      - validation
+  decision_record:
+    requires:
+      - id
+      - evidence
+      - owner
+      - history
+relations:
+  - source
+  - supports
+  - supersedes
