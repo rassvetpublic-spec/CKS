@@ -8,6 +8,8 @@ on:
       - 'tools/cks_obsidian_export.py'
       - 'tools/cks_dynamic_views.py'
       - 'tools/cks_knowledge_intelligence.py'
+      - 'tools/cks_knowledge_evolution.py'
+      - 'tools/cks_version_change_analyzer.py'
       - 'tools/cks_self_audit.py'
       - 'validators/lifecycle_guard.py'
       - 'schemas/cks-knowledge-object.schema.json'
@@ -21,6 +23,7 @@ on:
       - 'tests/test_cks_obsidian_stage3.py'
       - 'tests/test_cks_dynamic_views_stage4.py'
       - 'tests/test_cks_knowledge_intelligence_stage5.py'
+      - 'tests/test_cks_knowledge_evolution_stage6.py'
       - '.github/workflows/cks-knowledge-runtime-intelligence.yml'
   pull_request:
     paths:
@@ -29,6 +32,8 @@ on:
       - 'tools/cks_obsidian_export.py'
       - 'tools/cks_dynamic_views.py'
       - 'tools/cks_knowledge_intelligence.py'
+      - 'tools/cks_knowledge_evolution.py'
+      - 'tools/cks_version_change_analyzer.py'
       - 'tools/cks_self_audit.py'
       - 'validators/lifecycle_guard.py'
       - 'schemas/cks-knowledge-object.schema.json'
@@ -42,6 +47,7 @@ on:
       - 'tests/test_cks_obsidian_stage3.py'
       - 'tests/test_cks_dynamic_views_stage4.py'
       - 'tests/test_cks_knowledge_intelligence_stage5.py'
+      - 'tests/test_cks_knowledge_evolution_stage6.py'
       - '.github/workflows/cks-knowledge-runtime-intelligence.yml'
 
 permissions:
@@ -49,7 +55,7 @@ permissions:
 
 jobs:
   knowledge-runtime:
-    name: Проверка этапов 2–5 рабочего контура знаний
+    name: Проверка этапов 2–6 рабочего контура знаний
     runs-on: ubuntu-latest
     steps:
       - name: Получить репозиторий
@@ -60,13 +66,15 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Проверить синтаксис модулей этапов 2–5
+      - name: Проверить синтаксис модулей этапов 2–6
         run: |
           python -m py_compile tools/cks_knowledge_runtime.py
           python -m py_compile tools/cks_knowledge_state_machine.py
           python -m py_compile tools/cks_obsidian_export.py
           python -m py_compile tools/cks_dynamic_views.py
           python -m py_compile tools/cks_knowledge_intelligence.py
+          python -m py_compile tools/cks_knowledge_evolution.py
+          python -m py_compile tools/cks_version_change_analyzer.py
           python -m py_compile tools/cks_self_audit.py
           python -m py_compile validators/lifecycle_guard.py
 
@@ -84,6 +92,9 @@ jobs:
 
       - name: Этап 5 — структурная аналитика знаний
         run: python -m unittest discover -s tests -p 'test_cks_knowledge_intelligence_stage5.py' -v
+
+      - name: Этап 6 — эволюция, миграция и восстановление
+        run: python -m unittest discover -s tests -p 'test_cks_knowledge_evolution_stage6.py' -v
 
       - name: Выполнить самопроверку CKS
         run: python tools/cks_self_audit.py --root . --report reports/knowledge-runtime-self-audit.json
