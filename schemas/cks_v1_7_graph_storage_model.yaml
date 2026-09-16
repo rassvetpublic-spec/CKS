@@ -9,6 +9,11 @@ node:
   project: string_or_null
   lifecycle: string_or_null
   metadata: object
+  metadata_reserved:
+    _cks_node_versioning:
+      version: integer
+      history: list
+      rule_ru: "Служебная история версий узла. Хранится внутри metadata для обратной совместимости schema_version 2.0 и переживает save/load графа."
 
 edge:
   id: stable_relation_id
@@ -19,6 +24,20 @@ edge:
   evidence: list
   metadata: object
   history: list
+
+node_lifecycle:
+  engine: tools/cks_graph_node_versioning.py
+  validation: tools/cks_knowledge_state_machine.py
+  rule_ru: "Жизненный цикл узла использует действующую машину состояний знаний. Переход в canonical требует доказательства и ссылки на решение."
+
+node_versioning:
+  engine: tools/cks_graph_node_versioning.py
+  initial_version: 1
+  increment_on_change: true
+  history_events:
+    - created
+    - updated
+  rule_ru: "Версионирование узлов является надстройкой над существующим KnowledgeGraph, а не вторым графовым движком."
 
 relation_history:
   description_ru: "Неудаляемый журнал создания, изменения и удаления связей графа."
