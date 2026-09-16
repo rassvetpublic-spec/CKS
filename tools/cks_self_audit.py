@@ -2,8 +2,8 @@
 """Система самопроверки архитектуры CKS.
 
 CKS Self Audit System (система самопроверки CKS) диагностирует структуру,
-управляющий слой и рабочие модули. Она не изменяет файлы, не принимает
-решения и не создаёт Canon.
+управляющий слой, рабочий Runtime и исторические compatibility-слои. Она не
+изменяет файлы, не принимает решения и не создаёт Canon.
 """
 from __future__ import annotations
 
@@ -46,6 +46,7 @@ REQUIRED_PATHS = (
     "tools/cks_governance_runner.py",
     "tools/cks_knowledge_runtime.py",
     "tools/cks_knowledge_intelligence.py",
+    "tools/cks_compatibility_audit.py",
 )
 
 RUNTIME_MODULES = (
@@ -56,6 +57,18 @@ RUNTIME_MODULES = (
     "tools/cks_governance_runner.py",
     "tools/cks_knowledge_runtime.py",
     "tools/cks_knowledge_intelligence.py",
+    "tools/cks_compatibility_audit.py",
+    "tools/cks_v1_6_intelligence_runtime.py",
+    "tools/cks_canon_conflict_detector.py",
+    "tools/cks_knowledge_health_score.py",
+    "tools/cks_v1_7_graph_validator.py",
+    "tools/cks_v1_7_orphan_node_detector.py",
+    "tools/cks_v1_7_relation_engine.py",
+    "tools/cks_v1_4_metrics_calculator.py",
+    "tools/cks_v1_4_graph_builder.py",
+    "tools/cks_v1_4_review_gate_runner.py",
+    "tools/cks_v1_4_migration_adapter.py",
+    "tools/cks_v1_4_dashboard_runtime.py",
 )
 
 
@@ -78,25 +91,23 @@ class SelfAudit:
         if not path.exists():
             return
         text = path.read_text(encoding="utf-8", errors="replace")
-        required_markers = (
+        for marker in (
             "current_version:",
             "core: frozen",
             "experiments: isolated",
             "proposal_is_not_decision: true",
             "experiment_is_not_canon: true",
-        )
-        for marker in required_markers:
+        ):
             if marker not in text:
                 self.add("FAIL", "SYSTEM_STATE_CONTRACT", rel, f"Нет обязательного признака: {marker}")
 
     def check_ssot_registry(self) -> None:
-        """Проверить, что реестр SSOT указывает на фактические слои репозитория."""
         rel = "control/ssot-registry.yaml"
         path = self.root / rel
         if not path.exists():
             return
         text = path.read_text(encoding="utf-8", errors="replace")
-        required_markers = (
+        for marker in (
             "architecture:",
             "schemas:",
             "decisions:",
@@ -108,8 +119,7 @@ class SelfAudit:
             "path: engine/",
             "obsidian_views:",
             "authority: derived_view_only",
-        )
-        for marker in required_markers:
+        ):
             if marker not in text:
                 self.add("FAIL", "SSOT_REGISTRY_CONTRACT", rel, f"Нет обязательного признака SSOT: {marker}")
         if not (self.root / "tools").is_dir():
@@ -176,7 +186,6 @@ class SelfAudit:
             graph.add_edge("CKS-KNW-9001", "CKS-DEC-9001", "decided_by")
             if graph.validate()["status"] == "FAIL":
                 self.add("FAIL", "GRAPH_RUNTIME", "tools/cks_knowledge_graph_runtime.py", "Рабочий граф не прошёл внутреннюю проверку")
-
             try:
                 graph.add_edge("CKS-KNW-9001", "CKS-MISSING-1", "depends_on")
                 self.add("FAIL", "GRAPH_BROKEN_REF_ACCEPTED", "tools/cks_knowledge_graph_runtime.py", "Граф принял ссылку на отсутствующий узел")
@@ -184,57 +193,65 @@ class SelfAudit:
                 pass
 
             trace = TraceabilityEngine()
-            result = trace.ingest([
+            trace_result = trace.ingest([
                 {"id": "CKS-EVD-9001", "type": "evidence"},
                 {"id": "CKS-DEC-9001", "type": "decision"},
                 {"id": "CKS-KNW-9001", "type": "knowledge", "evidence": ["CKS-EVD-9001"], "decision": "CKS-DEC-9001"},
             ])
-            if result["status"] == "FAIL" or result["edges"] != 2:
+            if trace_result["status"] == "FAIL" or trace_result["edges"] != 2:
                 self.add("FAIL", "TRACE_RUNTIME", "tools/cks_traceability_engine.py", "Цепочка происхождения строится некорректно")
 
             knowledge = KnowledgeRuntime()
             validation = knowledge.ingest([
                 {
-                    "id": "CKS-KNW-9201",
-                    "type": "knowledge",
-                    "status": "knowledge",
-                    "owner": "CKS",
-                    "lifecycle": "knowledge",
-                    "clusters": ["архитектура"],
-                    "tags": ["cks", "runtime"],
-                    "projects": ["CKS"],
-                    "relations": [],
-                    "evidence": ["CKS-EVD-9001"],
-                    "history": [{"status": "validated"}],
+                    "id": "CKS-KNW-9201", "type": "knowledge", "status": "knowledge", "owner": "CKS", "lifecycle": "knowledge",
+                    "clusters": ["архитектура"], "tags": ["cks", "runtime"], "projects": ["CKS"], "relations": [],
+                    "evidence": ["CKS-EVD-9001"], "history": [{"status": "validated"}],
                 },
                 {
-                    "id": "CKS-KNW-9202",
-                    "type": "knowledge",
-                    "status": "evolving",
-                    "owner": "CKS",
-                    "lifecycle": "knowledge",
-                    "clusters": ["архитектура"],
-                    "tags": ["cks", "runtime"],
-                    "projects": ["CKS"],
-                    "relations": [],
-                    "evidence": ["CKS-EVD-9001"],
-                    "history": [{"status": "clustered"}],
+                    "id": "CKS-KNW-9202", "type": "knowledge", "status": "evolving", "owner": "CKS", "lifecycle": "knowledge",
+                    "clusters": ["архитектура"], "tags": ["cks", "runtime"], "projects": ["CKS"], "relations": [],
+                    "evidence": ["CKS-EVD-9001"], "history": [{"status": "clustered"}],
                 },
             ])
             if validation["status"] != "PASS":
                 self.add("FAIL", "KNOWLEDGE_RUNTIME", "tools/cks_knowledge_runtime.py", "Рабочий контур знаний не принял эталонные объекты")
-            views = knowledge.dynamic_views()
-            if "архитектура" not in views.get("по_кластерам", {}):
+            if "архитектура" not in knowledge.dynamic_views().get("по_кластерам", {}):
                 self.add("FAIL", "KNOWLEDGE_VIEWS", "tools/cks_knowledge_runtime.py", "Не построено кластерное представление")
-
             intelligence = KnowledgeIntelligence(knowledge)
             if not intelligence.hidden_links(threshold=0.3):
                 self.add("FAIL", "KNOWLEDGE_INTELLIGENCE_LINKS", "tools/cks_knowledge_intelligence.py", "Не найден ожидаемый кандидат скрытой связи")
-            audit = intelligence.quality_audit()
-            if audit.get("authority") != "diagnostic_only":
+            if intelligence.quality_audit().get("authority") != "diagnostic_only":
                 self.add("FAIL", "KNOWLEDGE_INTELLIGENCE_AUTHORITY", "tools/cks_knowledge_intelligence.py", "Самоаудит знаний должен оставаться диагностическим")
         except Exception as exc:
             self.add("FAIL", "RUNTIME_IMPORT_OR_EXECUTION", "tools", f"Ошибка рабочего контура: {exc}")
+        finally:
+            if sys.path and sys.path[0] == str(tools):
+                sys.path.pop(0)
+
+    def check_compatibility_layers(self) -> None:
+        """Проверить, что исторические интерфейсы не деградировали в заглушки."""
+        tools = self.root / "tools"
+        sys.path.insert(0, str(tools))
+        try:
+            from cks_compatibility_audit import run_compatibility_audit
+
+            result = run_compatibility_audit()
+            if result.get("status") != "PASS":
+                failed = ", ".join(result.get("failed_checks") or []) or "неизвестная ошибка"
+                self.add(
+                    "FAIL",
+                    "COMPATIBILITY_LAYER_INTEGRITY",
+                    "tools/cks_compatibility_audit.py",
+                    f"Compatibility-слои не прошли содержательную проверку: {failed}",
+                )
+        except Exception as exc:
+            self.add(
+                "FAIL",
+                "COMPATIBILITY_LAYER_EXECUTION",
+                "tools/cks_compatibility_audit.py",
+                f"Ошибка проверки compatibility-слоёв: {exc}",
+            )
         finally:
             if sys.path and sys.path[0] == str(tools):
                 sys.path.pop(0)
@@ -247,10 +264,11 @@ class SelfAudit:
         self.check_knowledge_model_contract()
         self.check_python_syntax()
         self.check_runtime_contract()
+        self.check_compatibility_layers()
         failures = sum(1 for x in self.findings if x.level == "FAIL")
         warnings = sum(1 for x in self.findings if x.level == "WARN")
         return {
-            "schema_version": "1.2",
+            "schema_version": "1.3",
             "kind": "cks_self_audit",
             "status": "FAIL" if failures else ("WARN" if warnings else "PASS"),
             "summary": {"fail": failures, "warn": warnings},
@@ -260,11 +278,10 @@ class SelfAudit:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="CKS: самопроверка архитектуры и рабочего контура")
+    parser = argparse.ArgumentParser(description="CKS: самопроверка архитектуры, Runtime и compatibility-слоёв")
     parser.add_argument("--root", default=".")
     parser.add_argument("--report")
     args = parser.parse_args()
-
     result = SelfAudit(args.root).run()
     text = json.dumps(result, ensure_ascii=False, indent=2) + "\n"
     if args.report:
