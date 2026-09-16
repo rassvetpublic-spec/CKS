@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CKS v1.4 Metrics Object",
+  "type": "object",
+  "required": ["object_id","health_score","evidence_score","freshness_score","consistency_score"],
+  "properties": {
+    "object_id": {"type":"string"},
+    "health_score": {"type":"number","minimum":0,"maximum":100},
+    "evidence_score": {"type":"number","minimum":0,"maximum":100},
+    "freshness_score": {"type":"number","minimum":0,"maximum":100},
+    "consistency_score": {"type":"number","minimum":0,"maximum":100}
+  }
+}
