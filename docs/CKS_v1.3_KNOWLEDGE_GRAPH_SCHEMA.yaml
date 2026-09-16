@@ -1,0 +1,15 @@
+objects:
+  - knowledge_object
+  - evidence_record
+  - decision_record
+  - proposal
+  - gap
+  - owner
+  - history
+
+rules:
+  canon_requires:
+    - evidence
+    - decision
+    - history
+  research_isolated: true
