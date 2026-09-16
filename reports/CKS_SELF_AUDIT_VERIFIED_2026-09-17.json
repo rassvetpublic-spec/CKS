@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.2",
+  "kind": "cks_self_audit",
+  "status": "PASS",
+  "summary": {
+    "fail": 0,
+    "warn": 0
+  },
+  "findings": [],
+  "authority": "diagnostic_only",
+  "verification": {
+    "source": "GitHub Actions",
+    "run_id": 35161446191,
+    "job_id": 105012880559,
+    "head_commit": "01812501ca686461b805fb391b17c8b1dfc03f23",
+    "verified_at": "2026-09-16T23:15:07Z",
+    "note_ru": "Постоянная копия результата самопроверки, извлечённая из лога подтверждённого GitHub Actions run. Не является архитектурным решением и не изменяет Канон."
+  }
+}
