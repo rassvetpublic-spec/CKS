@@ -51,3 +51,13 @@ idea -> research -> audit -> ABC/XYZ -> decision -> possible adoption
 ## Deletion safety
 
 After storing this migration artifact, future work can continue from GitHub without requiring the original chat history.
+
+## Migration verification
+
+Verified:
+- Bootstrap snapshot aligned.
+- ADR records aligned.
+- Architecture boundaries preserved.
+
+Status:
+Migration context verified.
