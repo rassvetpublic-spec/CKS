@@ -1,0 +1,17 @@
+cks:
+  current_version: CKS_v1.5
+
+architecture:
+  baseline: CKS_v1.2
+  operational: CKS_v1.3
+  runtime: CKS_v1.4
+  development: CKS_v1.5
+
+status:
+  core: frozen
+  runtime: evolving
+  experiments: isolated
+
+principle:
+  proposal_is_not_decision: true
+  experiment_is_not_canon: true
