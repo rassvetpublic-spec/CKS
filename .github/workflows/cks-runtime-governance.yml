@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Получить репозиторий
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Настроить Python
         uses: actions/setup-python@v5
