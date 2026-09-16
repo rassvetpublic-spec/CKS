@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cks.local/schemas/cks-knowledge-view.schema.json",
+  "title": "CKS — динамическое представление знаний",
+  "description": "Производное представление объектов знаний. Не является SSOT и не принимает решений.",
+  "type": "object",
+  "required": ["schema_version", "kind", "authority", "objects"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "kind": {"const": "cks_dynamic_views"},
+    "authority": {"const": "derived_view_only"},
+    "objects": {"type": "integer", "minimum": 0},
+    "по_статусам": {"$ref": "#/$defs/index"},
+    "по_типам": {"$ref": "#/$defs/index"},
+    "по_кластерам": {"$ref": "#/$defs/index"},
+    "по_тегам": {"$ref": "#/$defs/index"},
+    "по_проектам": {"$ref": "#/$defs/index"},
+    "по_уверенности": {"$ref": "#/$defs/index"},
+    "путь_материал_в_знание": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["count", "objects"],
+        "properties": {
+          "count": {"type": "integer", "minimum": 0},
+          "objects": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "index": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {"type": "string"}
+      }
+    }
+  },
+  "additionalProperties": true
+}
