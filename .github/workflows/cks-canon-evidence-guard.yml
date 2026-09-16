@@ -2,11 +2,26 @@ name: CKS Canon Evidence Guard
 
 on:
   pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   canon-guard:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check canon evidence boundary
-        run: echo "Canon requires Evidence + Decision + History"
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Enforce Canon evidence boundary
+        run: python tools/cks_ci.py --mode canon
+      - name: Upload Canon Guard report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cks-canon-guard-report
+          path: artifacts/cks-ci/
