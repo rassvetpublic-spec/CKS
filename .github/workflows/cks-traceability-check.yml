@@ -3,11 +3,25 @@ name: CKS Traceability Check
 on:
   pull_request:
   push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   traceability:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Validate CKS traceability
-        run: echo "Traceability validation placeholder"
+        run: python tools/cks_ci.py --mode traceability
+      - name: Upload traceability report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cks-traceability-report
+          path: artifacts/cks-ci/
