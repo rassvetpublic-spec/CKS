@@ -5,17 +5,23 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate CKS structure
-        run: |
-          test -f README.md
-          test -d protocols
-          test -d schemas
-          test -d decisions
-          test -d evidence
-          test -d graveyard
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate CKS structure and contracts
+        run: python tools/cks_ci.py --mode all
+      - name: Upload CKS validation reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cks-validation-report
+          path: artifacts/cks-ci/
