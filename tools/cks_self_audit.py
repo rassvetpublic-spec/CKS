@@ -89,6 +89,36 @@ class SelfAudit:
             if marker not in text:
                 self.add("FAIL", "SYSTEM_STATE_CONTRACT", rel, f"Нет обязательного признака: {marker}")
 
+    def check_ssot_registry(self) -> None:
+        """Проверить, что реестр SSOT указывает на фактические слои репозитория."""
+        rel = "control/ssot-registry.yaml"
+        path = self.root / rel
+        if not path.exists():
+            return
+        text = path.read_text(encoding="utf-8", errors="replace")
+        required_markers = (
+            "architecture:",
+            "schemas:",
+            "decisions:",
+            "knowledge:",
+            "evidence:",
+            "runtime:",
+            "path: tools/",
+            "runtime_rules:",
+            "path: engine/",
+            "obsidian_views:",
+            "authority: derived_view_only",
+        )
+        for marker in required_markers:
+            if marker not in text:
+                self.add("FAIL", "SSOT_REGISTRY_CONTRACT", rel, f"Нет обязательного признака SSOT: {marker}")
+        if not (self.root / "tools").is_dir():
+            self.add("FAIL", "SSOT_RUNTIME_PATH", "tools/", "Реестр указывает runtime в tools/, но каталог отсутствует")
+        if not (self.root / "engine").is_dir():
+            self.add("FAIL", "SSOT_RUNTIME_RULES_PATH", "engine/", "Реестр указывает runtime_rules в engine/, но каталог отсутствует")
+        if not (self.root / "obsidian").is_dir():
+            self.add("FAIL", "SSOT_OBSIDIAN_PATH", "obsidian/", "Реестр указывает Obsidian-представления, но каталог отсутствует")
+
     def check_language_policy(self) -> None:
         rel = "docs/ADR-007_Двуязычная_модель_документации_CKS.md"
         path = self.root / rel
@@ -212,6 +242,7 @@ class SelfAudit:
     def run(self) -> dict[str, object]:
         self.check_required_paths()
         self.check_system_state()
+        self.check_ssot_registry()
         self.check_language_policy()
         self.check_knowledge_model_contract()
         self.check_python_syntax()
@@ -219,7 +250,7 @@ class SelfAudit:
         failures = sum(1 for x in self.findings if x.level == "FAIL")
         warnings = sum(1 for x in self.findings if x.level == "WARN")
         return {
-            "schema_version": "1.1",
+            "schema_version": "1.2",
             "kind": "cks_self_audit",
             "status": "FAIL" if failures else ("WARN" if warnings else "PASS"),
             "summary": {"fail": failures, "warn": warnings},
