@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   runtime-governance:
-    name: Рабочий граф, трассируемость, федерация и самоаудит
+    name: Рабочий граф, знания, представления, трассируемость и самоаудит
     runs-on: ubuntu-latest
     steps:
       - name: Получить репозиторий
@@ -32,10 +32,28 @@ jobs:
             tools/cks_knowledge_federation.py \
             tools/cks_self_audit.py \
             tools/cks_runtime_pipeline.py \
-            tools/cks_governance_runner.py
+            tools/cks_governance_runner.py \
+            tools/cks_knowledge_runtime.py \
+            tools/cks_knowledge_state_machine.py \
+            tools/cks_obsidian_export.py \
+            tools/cks_dynamic_views.py
 
-      - name: Запустить интеграционные тесты
+      - name: Проверить JSON-схемы знаний
+        run: |
+          python -m json.tool schemas/cks-knowledge-object.schema.json >/dev/null
+          python -m json.tool schemas/cks-knowledge-view.schema.json >/dev/null
+
+      - name: Запустить интеграционные тесты рабочего ядра
         run: python tests/test_cks_runtime_core.py -v
+
+      - name: Проверить этап 2 — рабочий контур знаний
+        run: python tests/test_cks_knowledge_runtime_stage2.py -v
+
+      - name: Проверить этап 3 — Obsidian
+        run: python tests/test_cks_obsidian_stage3.py -v
+
+      - name: Проверить этап 4 — динамические представления
+        run: python tests/test_cks_dynamic_views_stage4.py -v
 
       - name: Выполнить самоаудит CKS
         run: python tools/cks_self_audit.py --root . --report artifacts/cks-runtime/self-audit.json
