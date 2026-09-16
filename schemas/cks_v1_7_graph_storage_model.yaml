@@ -1,0 +1,14 @@
+version: v1.7
+kind: GraphStorageModel
+
+node:
+  id: string
+  type: string
+  lifecycle: string
+  metadata: object
+
+edge:
+  source: node_id
+  target: node_id
+  relation: string
+  evidence: list
