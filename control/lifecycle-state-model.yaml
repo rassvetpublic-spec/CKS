@@ -1,0 +1,14 @@
+lifecycle:
+  states:
+    - discovered
+    - researched
+    - proposed
+    - reviewed
+    - accepted
+    - canonical
+    - deprecated
+    - archived
+
+rules:
+  proposed_is_not_canonical: true
+  archived_is_read_only: true
