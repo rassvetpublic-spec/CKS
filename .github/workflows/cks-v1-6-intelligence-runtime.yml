@@ -1,13 +1,46 @@
 name: CKS v1.6 Intelligence Runtime
 
 on:
+  push:
+    paths:
+      - 'tools/cks_v1_6_intelligence_runtime.py'
+      - 'tools/cks_canon_conflict_detector.py'
+      - 'tools/cks_knowledge_health_score.py'
+      - 'tools/cks_knowledge_intelligence.py'
+      - 'tools/cks_knowledge_runtime.py'
+      - 'tests/test_cks_v1_6_compatibility_runtime.py'
+      - '.github/workflows/cks-v1-6-intelligence-runtime.yml'
   pull_request:
+    paths:
+      - 'tools/cks_v1_6_intelligence_runtime.py'
+      - 'tools/cks_canon_conflict_detector.py'
+      - 'tools/cks_knowledge_health_score.py'
+      - 'tools/cks_knowledge_intelligence.py'
+      - 'tools/cks_knowledge_runtime.py'
+      - 'tests/test_cks_v1_6_compatibility_runtime.py'
+      - '.github/workflows/cks-v1-6-intelligence-runtime.yml'
   workflow_dispatch:
 
 jobs:
   intelligence-runtime:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Run governance intelligence checks
-        run: python tools/cks_v1_6_intelligence_runtime.py
+      - name: Получить репозиторий
+        uses: actions/checkout@v4
+
+      - name: Настроить Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Проверить синтаксис совместимого слоя
+        run: |
+          python -m py_compile tools/cks_v1_6_intelligence_runtime.py
+          python -m py_compile tools/cks_canon_conflict_detector.py
+          python -m py_compile tools/cks_knowledge_health_score.py
+
+      - name: Выполнить регрессию v1.6 совместимости
+        run: python -m unittest discover -s tests -p 'test_cks_v1_6_compatibility_runtime.py' -v
+
+      - name: Выполнить реальную самопроверку Intelligence Runtime
+        run: python tools/cks_v1_6_intelligence_runtime.py --self-check
