@@ -1,30 +1,58 @@
-# CKS Architecture v1
+# Архитектура CKS v1.2
 
-## Purpose
+## Назначение
 
-CKS is an independent Context Knowledge System.
+CKS (Context Knowledge System — система контекста и знаний) является независимой системой управления контекстом, знаниями, решениями, доказательствами и историей изменений.
 
-## Storage separation
+## Граница системы
 
-CKS may contain storage adapters and repositories, but KAT9I_OS remains an execution system, not a knowledge database.
+CKS не является исполнительным слоем.
 
-## Core
+KAT9I_OS отвечает за исполнение, рабочие процессы и операции.
+
+CKS предоставляет правила, договоры и структуру работы со знаниями.
+
+## Разделение хранения
+
+CKS может содержать адаптеры хранения (модули подключения к хранилищам), но внутреннее состояние CKS не принадлежит KAT9I_OS.
+
+## Основные части
 
 ```
 CKS
-├── core
-├── modes
-├── schemas
-├── protocols
-├── adapters
-├── knowledge
-├── decisions
-├── graveyard
-└── evidence
+├── core (ядро системы)
+├── modes (режимы работы)
+├── schemas (схемы данных)
+├── protocols (договоры обмена)
+├── adapters (адаптеры подключения)
+├── knowledge (знания)
+├── decisions (решения)
+├── graveyard (архив отвергнутых вариантов)
+└── evidence (доказательства)
 ```
 
-## Integration
+## Состояние v1.2
 
-Communication with KAT9I_OS happens through artifact contracts and schemas.
+```yaml
+architecture: stable
+core: frozen
+development: gap_driven
+```
 
-No direct internal dependency.
+## Правило изменений
+
+Любое изменение архитектуры проходит путь:
+
+```
+GAP (выявленный разрыв)
+↓
+Evidence (доказательство необходимости)
+↓
+Proposal (предложение)
+↓
+Decision (решение)
+↓
+Minimal Change (минимальное изменение)
+```
+
+Предложения и эксперименты не становятся частью архитектуры автоматически.
