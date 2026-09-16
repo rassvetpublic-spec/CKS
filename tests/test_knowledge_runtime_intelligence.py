@@ -26,7 +26,7 @@ FIXTURES = [
         "clusters": ["архитектура", "граф знаний"],
         "tags": ["cks", "graph", "runtime"],
         "projects": ["CKS"],
-        "relations": [{"target": "CKS-KNW-9102", "type": "depends_on"}],
+        "relations": [{"target": "CKS-EVD-9101", "type": "evidenced_by"}],
         "evidence": ["CKS-EVD-9101"],
         "history": [
             {"status": "raw", "timestamp": "2026-09-01T10:00:00Z"},
@@ -46,7 +46,7 @@ FIXTURES = [
         "tags": ["cks", "graph", "intelligence"],
         "projects": ["CKS"],
         "relations": [],
-        "evidence": ["CKS-EVD-9102"],
+        "evidence": ["CKS-EVD-9101"],
         "history": [{"status": "clustered", "timestamp": "2026-09-11T10:00:00Z"}],
         "signals": {"confidence": 0.75},
     },
@@ -82,7 +82,7 @@ class KnowledgeRuntimeTests(unittest.TestCase):
     def test_obsidian_export_has_wikilinks_and_russian_labels(self) -> None:
         text = self.runtime.obsidian_markdown("CKS-KNW-9101")
         self.assertIn("status_ru", text)
-        self.assertIn("[[CKS-KNW-9102]]", text)
+        self.assertIn("[[CKS-EVD-9101]]", text)
         self.assertIn("Интуиция", text)
         with tempfile.TemporaryDirectory() as temp_dir:
             result = self.runtime.export_obsidian(temp_dir)
