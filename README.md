@@ -1,33 +1,33 @@
-# CKS — Context Knowledge System
+# CKS — система контекста и знаний (Context Knowledge System)
 
-Independent knowledge and decision framework compatible with KAT9I_OS.
+Независимая система работы с контекстом и решениями, совместимая с KAT9I_OS.
 
-## Boundary principle
+## Принцип границы
 
-CKS is not a component of KAT9I_OS. It is an independent system that provides context processing, decision management and knowledge storage protocols.
+CKS не является компонентом KAT9I_OS. Это независимая система, которая предоставляет правила обработки контекста, управления решениями и хранения знаний.
 
-KAT9I_OS consumes CKS protocols but does not own CKS storage.
+KAT9I_OS использует договоры CKS, но не владеет хранилищем CKS.
 
-## Layers
+## Слои
 
-- Core Engine
-- Context Split Modes
-- Knowledge Objects
-- Decision System
-- External Storage Adapters
-- Protocol Contracts
+- ядро обработки (Core Engine)
+- режимы разделения контекста (Context Split Modes)
+- объекты знаний (Knowledge Objects)
+- система решений (Decision System)
+- внешние адаптеры хранения (External Storage Adapters)
+- договоры обмена (Protocol Contracts)
 
-## Modes
+## Режимы работы
 
-- SPLIT
-- AUDIT
-- REVIEW
-- RESEARCH
-- MIGRATION
-- CLEANUP
-- MERGE
-- CANON CHECK
+- разделение (SPLIT)
+- аудит (AUDIT)
+- проверка (REVIEW)
+- исследование (RESEARCH)
+- перенос (MIGRATION)
+- очистка (CLEANUP)
+- объединение (MERGE)
+- проверка канона (CANON CHECK)
 
-## Status
+## Статус
 
-Architecture initialization stage.
+Этап инициализации архитектуры.
