@@ -1,0 +1,26 @@
+name: CKS Boundary Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  boundary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check CKS boundary rules
+        run: python tools/cks_ci.py --mode review-gate
+      - name: Upload boundary report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cks-boundary-report
+          path: artifacts/cks-ci/
