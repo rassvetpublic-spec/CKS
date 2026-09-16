@@ -1,0 +1,23 @@
+ssot:
+  architecture:
+    path: architecture/
+  schemas:
+    path: schemas/
+  decisions:
+    path: decisions/
+  protocols:
+    path: protocols/
+  knowledge:
+    path: knowledge/
+  evidence:
+    path: evidence/
+  runtime:
+    path: engine/
+
+record:
+  required_fields:
+    - id
+    - type
+    - status
+    - version
+    - source
