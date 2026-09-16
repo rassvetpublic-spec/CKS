@@ -1,0 +1,13 @@
+traceability:
+  chain:
+    - research
+    - evidence
+    - knowledge_object
+    - decision
+    - implementation
+    - review
+
+required_links:
+  knowledge_to_evidence: true
+  decision_to_change: true
+  change_to_review: true
