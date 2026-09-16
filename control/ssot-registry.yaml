@@ -12,7 +12,15 @@ ssot:
   evidence:
     path: evidence/
   runtime:
+    path: tools/
+    note: "Фактические исполняемые модули CKS находятся в tools/. Производные runtime-результаты не становятся SSOT."
+  runtime_rules:
     path: engine/
+    note: "engine/ содержит правила продвижения и другие правила рабочего контура, но не основной исполняемый код."
+  obsidian_views:
+    path: obsidian/
+    authority: derived_view_only
+    note: "Obsidian — производное графическое представление, не SSOT."
 
 record:
   required_fields:
