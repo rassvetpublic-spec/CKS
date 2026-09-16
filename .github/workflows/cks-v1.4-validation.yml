@@ -1,0 +1,17 @@
+name: CKS v1.4 Validation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run CKS v1.4 validation
+        run: |
+          python tools/cks_v1_4_metrics_calculator.py
+          python tools/cks_v1_4_graph_builder.py
+          python tools/cks_v1_4_review_gate_runner.py
