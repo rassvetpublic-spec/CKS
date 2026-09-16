@@ -1,0 +1,13 @@
+name: CKS Control Plane Validation
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  validate-control-plane:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate control plane
+        run: python validators/control_plane_validator.py
