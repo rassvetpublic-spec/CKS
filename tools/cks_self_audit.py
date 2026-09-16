@@ -34,10 +34,18 @@ REQUIRED_PATHS = (
     "control/automation-governance.yaml",
     "docs/ADR-007_Двуязычная_модель_документации_CKS.md",
     "docs/ГЛОССАРИЙ.md",
+    "decisions/ADR-0002-knowledge-centric-runtime.md",
+    "docs/CKS_KNOWLEDGE_RUNTIME_AND_INTELLIGENCE_RU.md",
+    "schemas/cks-knowledge-object.schema.json",
+    "schemas/cks-knowledge-view.schema.json",
+    "obsidian/README.md",
+    "obsidian/Шаблон_объекта_знания.md",
     "tools/cks_knowledge_graph_runtime.py",
     "tools/cks_traceability_engine.py",
     "tools/cks_knowledge_federation.py",
     "tools/cks_governance_runner.py",
+    "tools/cks_knowledge_runtime.py",
+    "tools/cks_knowledge_intelligence.py",
 )
 
 RUNTIME_MODULES = (
@@ -46,6 +54,8 @@ RUNTIME_MODULES = (
     "tools/cks_knowledge_federation.py",
     "tools/cks_runtime_pipeline.py",
     "tools/cks_governance_runner.py",
+    "tools/cks_knowledge_runtime.py",
+    "tools/cks_knowledge_intelligence.py",
 )
 
 
@@ -90,6 +100,25 @@ class SelfAudit:
         if "docs/ГЛОССАРИЙ.md" not in text:
             self.add("WARN", "GLOSSARY_REFERENCE_MISSING", rel, "Не найдена ссылка на единый глоссарий")
 
+    def check_knowledge_model_contract(self) -> None:
+        rel = "schemas/cks-knowledge-object.schema.json"
+        path = self.root / rel
+        if not path.exists():
+            return
+        try:
+            schema = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            self.add("FAIL", "KNOWLEDGE_SCHEMA_JSON", rel, f"Схема не является корректным JSON: {exc}")
+            return
+        properties = schema.get("properties") or {}
+        for field in ("clusters", "tags", "projects", "relations", "history", "signals", "obsidian"):
+            if field not in properties:
+                self.add("FAIL", "KNOWLEDGE_SCHEMA_FIELD", rel, f"Нет поля модели знаний: {field}")
+        statuses = set(((properties.get("status") or {}).get("enum") or []))
+        for status in ("raw", "clustered", "validated", "knowledge", "canonical", "evolving", "archived"):
+            if status not in statuses:
+                self.add("FAIL", "KNOWLEDGE_STATUS_MISSING", rel, f"Нет статуса развития знания: {status}")
+
     def check_python_syntax(self) -> None:
         for rel in RUNTIME_MODULES:
             path = self.root / rel
@@ -106,6 +135,8 @@ class SelfAudit:
         try:
             from cks_knowledge_graph_runtime import GraphError, KnowledgeGraph
             from cks_traceability_engine import TraceabilityEngine
+            from cks_knowledge_runtime import KnowledgeRuntime
+            from cks_knowledge_intelligence import KnowledgeIntelligence
 
             graph = KnowledgeGraph()
             graph.add_node("CKS-EVD-9001", "evidence")
@@ -130,6 +161,48 @@ class SelfAudit:
             ])
             if result["status"] == "FAIL" or result["edges"] != 2:
                 self.add("FAIL", "TRACE_RUNTIME", "tools/cks_traceability_engine.py", "Цепочка происхождения строится некорректно")
+
+            knowledge = KnowledgeRuntime()
+            validation = knowledge.ingest([
+                {
+                    "id": "CKS-KNW-9201",
+                    "type": "knowledge",
+                    "status": "knowledge",
+                    "owner": "CKS",
+                    "lifecycle": "knowledge",
+                    "clusters": ["архитектура"],
+                    "tags": ["cks", "runtime"],
+                    "projects": ["CKS"],
+                    "relations": [],
+                    "evidence": ["CKS-EVD-9001"],
+                    "history": [{"status": "validated"}],
+                },
+                {
+                    "id": "CKS-KNW-9202",
+                    "type": "knowledge",
+                    "status": "evolving",
+                    "owner": "CKS",
+                    "lifecycle": "knowledge",
+                    "clusters": ["архитектура"],
+                    "tags": ["cks", "runtime"],
+                    "projects": ["CKS"],
+                    "relations": [],
+                    "evidence": ["CKS-EVD-9001"],
+                    "history": [{"status": "clustered"}],
+                },
+            ])
+            if validation["status"] != "PASS":
+                self.add("FAIL", "KNOWLEDGE_RUNTIME", "tools/cks_knowledge_runtime.py", "Рабочий контур знаний не принял эталонные объекты")
+            views = knowledge.dynamic_views()
+            if "архитектура" not in views.get("по_кластерам", {}):
+                self.add("FAIL", "KNOWLEDGE_VIEWS", "tools/cks_knowledge_runtime.py", "Не построено кластерное представление")
+
+            intelligence = KnowledgeIntelligence(knowledge)
+            if not intelligence.hidden_links(threshold=0.3):
+                self.add("FAIL", "KNOWLEDGE_INTELLIGENCE_LINKS", "tools/cks_knowledge_intelligence.py", "Не найден ожидаемый кандидат скрытой связи")
+            audit = intelligence.quality_audit()
+            if audit.get("authority") != "diagnostic_only":
+                self.add("FAIL", "KNOWLEDGE_INTELLIGENCE_AUTHORITY", "tools/cks_knowledge_intelligence.py", "Самоаудит знаний должен оставаться диагностическим")
         except Exception as exc:
             self.add("FAIL", "RUNTIME_IMPORT_OR_EXECUTION", "tools", f"Ошибка рабочего контура: {exc}")
         finally:
@@ -140,12 +213,13 @@ class SelfAudit:
         self.check_required_paths()
         self.check_system_state()
         self.check_language_policy()
+        self.check_knowledge_model_contract()
         self.check_python_syntax()
         self.check_runtime_contract()
         failures = sum(1 for x in self.findings if x.level == "FAIL")
         warnings = sum(1 for x in self.findings if x.level == "WARN")
         return {
-            "schema_version": "1.0",
+            "schema_version": "1.1",
             "kind": "cks_self_audit",
             "status": "FAIL" if failures else ("WARN" if warnings else "PASS"),
             "summary": {"fail": failures, "warn": warnings},
