@@ -1,0 +1,12 @@
+automation:
+  levels:
+    - manual
+    - validation
+    - automation
+    - assisted_review
+    - autonomous_suggestion
+
+restrictions:
+  automation_is_not_decision: true
+  automation_is_not_canon_change: true
+  approval_requires_review: true
