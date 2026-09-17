@@ -5,6 +5,7 @@ The helper is intentionally conservative:
 - no mutation unless --apply is passed;
 - requires an explicit admin-capable token from CKS_GITHUB_ADMIN_TOKEN or GITHUB_TOKEN;
 - validates the exact required check names on the current branch head before applying;
+- requires pull-request merging while requiring zero approving reviews;
 - refuses to replace an existing, different protection rule unless --replace-existing is passed;
 - reads the protection state back after mutation and fails if it does not match the intended policy.
 
@@ -112,7 +113,12 @@ def build_protection_payload(
             "contexts": list(required_checks),
         },
         "enforce_admins": True,
-        "required_pull_request_reviews": None,
+        "required_pull_request_reviews": {
+            "dismiss_stale_reviews": False,
+            "require_code_owner_reviews": False,
+            "required_approving_review_count": 0,
+            "require_last_push_approval": False,
+        },
         "restrictions": None,
         "required_linear_history": False,
         "allow_force_pushes": False,
@@ -132,6 +138,20 @@ def protection_contexts(protection: dict[str, Any] | None) -> list[str]:
     return [str(item) for item in contexts]
 
 
+def pull_request_requirement_matches(protection: dict[str, Any] | None) -> bool:
+    if not protection:
+        return False
+    reviews = protection.get("required_pull_request_reviews")
+    if not isinstance(reviews, dict):
+        return False
+    return (
+        reviews.get("required_approving_review_count") == 0
+        and not bool(reviews.get("dismiss_stale_reviews"))
+        and not bool(reviews.get("require_code_owner_reviews"))
+        and not bool(reviews.get("require_last_push_approval"))
+    )
+
+
 def protection_matches(
     protection: dict[str, Any] | None,
     required_checks: Iterable[str] = REQUIRED_CHECKS,
@@ -148,6 +168,7 @@ def protection_matches(
         actual == expected
         and strict
         and admins
+        and pull_request_requirement_matches(protection)
         and not force_pushes
         and not deletions
     )
@@ -301,6 +322,7 @@ def main(argv: list[str] | None = None) -> int:
                     "strict": bool(
                         (final_state.get("required_status_checks") or {}).get("strict")
                     ),
+                    "pull_request_required": pull_request_requirement_matches(final_state),
                     "enforce_admins": bool(
                         (final_state.get("enforce_admins") or {}).get("enabled")
                     ),
