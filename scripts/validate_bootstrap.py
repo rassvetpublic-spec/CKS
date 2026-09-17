@@ -18,5 +18,11 @@ def validate():
     return all(path.exists() for path in required)
 
 
+def main() -> int:
+    ok = validate()
+    print("PASS" if ok else "FAIL")
+    return 0 if ok else 1
+
+
 if __name__ == "__main__":
-    print("PASS" if validate() else "FAIL")
+    raise SystemExit(main())
