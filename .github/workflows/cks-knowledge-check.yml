@@ -11,10 +11,4 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Check CKS structure
-        run: |
-          test -d docs
-          test -d schemas
-          test -d protocols
-          test -d evidence
-          test -d decisions
-          test -d graveyard
+        uses: ./.github/actions/cks-structure-gate
