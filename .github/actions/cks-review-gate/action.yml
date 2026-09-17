@@ -1,0 +1,8 @@
+name: CKS Review Gate
+description: Shared Review Gate execution for CKS validation workflows
+runs:
+  using: composite
+  steps:
+    - name: Run shared CKS Review Gate
+      shell: bash
+      run: python tools/cks_ci.py --mode review-gate
