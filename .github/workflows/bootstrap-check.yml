@@ -8,7 +8,7 @@ jobs:
   validate-bootstrap:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Verify validator exit semantics
         run: python -m unittest discover -s tests -p 'test_cks_workflow_exit_semantics_stage_e3_2_a.py' -v
       - name: Validate Bootstrap
