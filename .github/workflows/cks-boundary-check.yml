@@ -17,7 +17,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Check CKS boundary rules
-        run: python tools/cks_ci.py --mode review-gate
+        uses: ./.github/actions/cks-review-gate
       - name: Upload boundary report
         if: always()
         uses: actions/upload-artifact@v6
