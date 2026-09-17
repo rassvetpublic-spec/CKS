@@ -4,7 +4,8 @@
 The helper is intentionally conservative:
 - no mutation unless --apply is passed;
 - requires an explicit admin-capable token from CKS_GITHUB_ADMIN_TOKEN or GITHUB_TOKEN;
-- validates the exact required check names on the current branch head before applying;
+- validates the exact required check names and canonical producer workflows on the current branch head before applying;
+- allows repeated executions of the same canonical workflow, but rejects a required context produced by a second workflow;
 - requires pull-request merging while requiring zero approving reviews;
 - refuses to replace an existing, different protection rule unless --replace-existing is passed;
 - reads the protection state back after mutation and fails if it does not match the intended policy.
@@ -36,6 +37,16 @@ REQUIRED_CHECKS = (
     "validate-control-plane",
     "validate-bootstrap",
 )
+EXPECTED_CHECK_WORKFLOWS = {
+    "Package 003 integrated automation gate": ".github/workflows/cks-package-003-automation.yml",
+    "boundary": ".github/workflows/cks-boundary-check.yml",
+    "canon-guard": ".github/workflows/cks-canon-evidence-guard.yml",
+    "traceability": ".github/workflows/cks-traceability-check.yml",
+    "governance": ".github/workflows/cks-governance-runner.yml",
+    "validate-control-plane": ".github/workflows/cks-control-plane-validation.yml",
+    "validate-bootstrap": ".github/workflows/bootstrap-check.yml",
+}
+PRODUCER_WORKFLOW_FIELD = "_cks_producer_workflow_path"
 
 
 class ProtectionError(RuntimeError):
@@ -86,19 +97,76 @@ def required_check_counts(check_runs: Iterable[dict[str, Any]]) -> Counter[str]:
     )
 
 
+def required_check_producers(
+    check_runs: Iterable[dict[str, Any]],
+    required_checks: Iterable[str] = REQUIRED_CHECKS,
+) -> dict[str, list[str]]:
+    required = set(required_checks)
+    producers: dict[str, set[str]] = {name: set() for name in required}
+    for run in check_runs:
+        if not isinstance(run, dict):
+            continue
+        name = str(run.get("name") or "")
+        if name not in required:
+            continue
+        producer = run.get(PRODUCER_WORKFLOW_FIELD)
+        if producer:
+            producers[name].add(str(producer))
+    return {name: sorted(values) for name, values in producers.items()}
+
+
 def validate_check_surface(
     check_runs: Iterable[dict[str, Any]],
     required_checks: Iterable[str] = REQUIRED_CHECKS,
+    expected_workflows: dict[str, str] | None = None,
 ) -> None:
-    counts = required_check_counts(check_runs)
-    missing = [name for name in required_checks if counts[name] == 0]
-    ambiguous = [name for name in required_checks if counts[name] > 1]
-    if missing or ambiguous:
+    runs = [run for run in check_runs if isinstance(run, dict)]
+    required = tuple(required_checks)
+    expected = EXPECTED_CHECK_WORKFLOWS if expected_workflows is None else expected_workflows
+    counts = required_check_counts(runs)
+    missing = [name for name in required if counts[name] == 0]
+    unresolved: list[str] = []
+    ambiguous: dict[str, list[str]] = {}
+    unexpected: dict[str, list[str]] = {}
+
+    for name in required:
+        matching = [run for run in runs if str(run.get("name") or "") == name]
+        if not matching:
+            continue
+        producer_values = {
+            str(run.get(PRODUCER_WORKFLOW_FIELD))
+            for run in matching
+            if run.get(PRODUCER_WORKFLOW_FIELD)
+        }
+        if len(producer_values) != len(
+            {
+                str(run.get(PRODUCER_WORKFLOW_FIELD))
+                for run in matching
+                if run.get(PRODUCER_WORKFLOW_FIELD)
+            }
+        ):
+            raise AssertionError("producer normalization must be deterministic")
+        if any(not run.get(PRODUCER_WORKFLOW_FIELD) for run in matching):
+            unresolved.append(name)
+            continue
+        if len(producer_values) > 1:
+            ambiguous[name] = sorted(producer_values)
+        expected_path = expected.get(name)
+        if expected_path is None:
+            unresolved.append(name)
+        elif producer_values != {expected_path}:
+            unexpected[name] = sorted(producer_values)
+
+    if missing or unresolved or ambiguous or unexpected:
         details = []
         if missing:
             details.append(f"missing={missing}")
+        if unresolved:
+            details.append(f"unresolved_producer={sorted(set(unresolved))}")
         if ambiguous:
-            details.append(f"ambiguous={ambiguous}")
+            details.append(f"ambiguous_producers={ambiguous}")
+        if unexpected:
+            details.append(f"unexpected_producers={unexpected}")
         raise ProtectionError(
             "Required check surface is not safe for protection: " + ", ".join(details)
         )
@@ -211,6 +279,36 @@ def get_branch(repo: str, branch: str, token: str) -> dict[str, Any]:
     return body
 
 
+def _actions_run_id(check_run: dict[str, Any]) -> int | None:
+    details_url = str(check_run.get("details_url") or check_run.get("html_url") or "")
+    if not details_url:
+        return None
+    parts = [part for part in urllib.parse.urlparse(details_url).path.split("/") if part]
+    try:
+        runs_index = parts.index("runs")
+        return int(parts[runs_index + 1])
+    except (ValueError, IndexError):
+        return None
+
+
+def get_actions_workflow_path(repo: str, run_id: int, token: str) -> str:
+    status, body = api_request(
+        "GET",
+        _api_url(repo, f"actions/runs/{run_id}"),
+        token,
+    )
+    if status != 200 or not isinstance(body, dict):
+        raise ProtectionError(
+            f"Cannot resolve workflow producer for Actions run {run_id}: HTTP {status}: {body}"
+        )
+    path = body.get("path")
+    if not isinstance(path, str) or not path:
+        raise ProtectionError(
+            f"Actions run {run_id} does not contain a workflow path"
+        )
+    return path
+
+
 def get_check_runs(repo: str, sha: str, token: str) -> list[dict[str, Any]]:
     status, body = api_request(
         "GET",
@@ -219,10 +317,26 @@ def get_check_runs(repo: str, sha: str, token: str) -> list[dict[str, Any]]:
     )
     if status != 200 or not isinstance(body, dict):
         raise ProtectionError(f"Cannot read check-runs for {sha}: HTTP {status}: {body}")
-    runs = body.get("check_runs")
-    if not isinstance(runs, list):
+    raw_runs = body.get("check_runs")
+    if not isinstance(raw_runs, list):
         raise ProtectionError("GitHub check-runs response did not contain a list")
-    return [run for run in runs if isinstance(run, dict)]
+
+    runs = [dict(run) for run in raw_runs if isinstance(run, dict)]
+    workflow_cache: dict[int, str] = {}
+    required = set(REQUIRED_CHECKS)
+    for run in runs:
+        name = str(run.get("name") or "")
+        if name not in required:
+            continue
+        run_id = _actions_run_id(run)
+        if run_id is None:
+            raise ProtectionError(
+                f"Cannot resolve producer workflow run for required check {name!r}"
+            )
+        if run_id not in workflow_cache:
+            workflow_cache[run_id] = get_actions_workflow_path(repo, run_id, token)
+        run[PRODUCER_WORKFLOW_FIELD] = workflow_cache[run_id]
+    return runs
 
 
 def get_protection(repo: str, branch: str, token: str) -> dict[str, Any] | None:
@@ -324,7 +438,9 @@ def main(argv: list[str] | None = None) -> int:
             "currently_protected": bool(branch_state.get("protected")),
             "current_required_contexts": protection_contexts(current),
             "current_policy_matches_target": protection_matches(current),
+            "observed_required_check_producers": required_check_producers(check_runs),
             "desired_required_contexts": list(REQUIRED_CHECKS),
+            "desired_check_producers": EXPECTED_CHECK_WORKFLOWS,
             "desired_payload": build_protection_payload(),
             "replace_existing": bool(args.replace_existing),
             "apply": bool(args.apply),
@@ -333,7 +449,7 @@ def main(argv: list[str] | None = None) -> int:
 
         if not args.apply:
             print(
-                "DRY-RUN PASS: check surface and existing protection state are safe; "
+                "DRY-RUN PASS: check surface, canonical producers, and existing protection state are safe; "
                 "no mutation performed"
             )
             return 0
