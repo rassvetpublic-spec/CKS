@@ -1,0 +1,21 @@
+{
+  "id": "CKS-OBJ-001",
+  "type": "rule",
+  "status": "active",
+  "owner": "cks-governance",
+  "lifecycle": "development",
+  "clusters": ["CORE"],
+  "relations": [
+    {
+      "type": "supports",
+      "target": "CKS-EVD-001"
+    }
+  ],
+  "evidence": ["CKS-EVD-001"],
+  "history": [
+    {
+      "status": "active",
+      "source": "adoption-package-001"
+    }
+  ]
+}
