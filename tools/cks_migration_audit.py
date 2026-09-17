@@ -3,6 +3,7 @@
 
 Detects documents without metadata markers and possible duplicate rule titles.
 The report is advisory and does not modify source documents or make Decisions.
+Generated reports are excluded so the audit cannot create its own migration debt.
 """
 from __future__ import annotations
 
@@ -13,14 +14,27 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "artifacts" / "cks-ci" / "migration-audit.json"
+GENERATED_ROOTS = {"artifacts", "reports"}
+
+
+def source_markdown_paths(root: Path) -> list[Path]:
+    paths: list[Path] = []
+    for path in root.rglob("*.md"):
+        rel = path.relative_to(root)
+        if any(part.startswith(".") for part in rel.parts):
+            continue
+        if rel.parts and rel.parts[0] in GENERATED_ROOTS:
+            continue
+        paths.append(path)
+    return sorted(paths, key=lambda p: p.relative_to(root).as_posix())
 
 
 def audit(root: Path = ROOT) -> dict[str, Any]:
     findings: list[dict[str, Any]] = []
     seen_titles: dict[str, Path] = {}
-    for path in root.rglob("*.md"):
-        if any(part.startswith(".") for part in path.relative_to(root).parts):
-            continue
+    checked_files = source_markdown_paths(root)
+
+    for path in checked_files:
         text = path.read_text(encoding="utf-8", errors="ignore")
         title = None
         for line in text.splitlines()[:20]:
@@ -45,10 +59,14 @@ def audit(root: Path = ROOT) -> dict[str, Any]:
                 "code": "MISSING_METADATA_HEADER",
                 "file": path.relative_to(root).as_posix(),
             })
+
     return {
-        "schema_version": "2.0",
+        "schema_version": "2.1",
         "status": "WARN" if findings else "PASS",
         "advisory": True,
+        "derived_artifact": True,
+        "ssot": False,
+        "checked_files": len(checked_files),
         "finding_count": len(findings),
         "findings": findings,
     }
@@ -65,7 +83,11 @@ def main() -> int:
     result = audit(root)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(json.dumps({"status": result["status"], "finding_count": result["finding_count"]}, ensure_ascii=False))
+    print(json.dumps({
+        "status": result["status"],
+        "checked_files": result["checked_files"],
+        "finding_count": result["finding_count"],
+    }, ensure_ascii=False))
     # Advisory by design: findings are migration debt, not an automatic Decision.
     return 0
 
