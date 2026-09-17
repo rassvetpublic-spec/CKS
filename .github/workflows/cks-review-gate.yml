@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Run CKS Review Gate
-        run: python tools/cks_ci.py --mode review-gate
+        uses: ./.github/actions/cks-review-gate
       - name: Upload Review Gate result
         if: always()
         uses: actions/upload-artifact@v6
