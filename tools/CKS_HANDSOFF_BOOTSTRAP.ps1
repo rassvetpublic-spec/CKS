@@ -1,7 +1,7 @@
 Clear-Host
 # CKS HANDSOFF BOOTSTRAP
-# Version: 1.2.0
-# Universal one-command entry point with local state protection.
+# Version: 1.2.1
+# Universal one-command entry point with execution context lock.
 
 $ErrorActionPreference = "Stop"
 
@@ -11,26 +11,21 @@ $Temp = Join-Path $env:TEMP "CKS_HANDSOFF"
 
 New-Item -ItemType Directory -Force -Path $Temp | Out-Null
 
-Write-Host "CKS HANDSOFF BOOTSTRAP v1.2.0"
+Write-Host "CKS HANDSOFF BOOTSTRAP v1.2.1"
 Write-Host "Discovering environment..."
 
 $roots = @(
     $env:CKS_WORKSPACE,
+    (Get-Location).Path,
     "C:\git",
-    "C:\Irvis-UPG\GIT",
-    "C:\Projects",
-    (Get-Location).Path
+    "C:\Irvis-UPG\GIT"
 ) | Where-Object { $_ } | Select-Object -Unique
 
 $repo = $null
+
 foreach ($root in $roots) {
     if (Test-Path $root) {
-        if ((Split-Path $root -Leaf) -eq "CKS" -and (Test-Path (Join-Path $root ".git"))) {
-            $repo = Get-Item $root
-            break
-        }
-
-        $repo = Get-ChildItem -Path $root -Directory -Recurse -Force -ErrorAction SilentlyContinue |
+        $repo = Get-ChildItem -Path $root -Directory -Force -ErrorAction SilentlyContinue |
             Where-Object { $_.Name -eq "CKS" -and (Test-Path (Join-Path $_.FullName ".git")) } |
             Select-Object -First 1
 
@@ -40,11 +35,8 @@ foreach ($root in $roots) {
 
 if ($repo) {
     Write-Host "Local CKS found: $($repo.FullName)"
-    $local = Join-Path $repo.FullName "tools\CKS_HANDSOFF_BOOTSTRAP.ps1"
-    if (Test-Path $local) {
-        Write-Host "Local bootstrap detected: $local"
-        Write-Host "Remote bootstrap remains source of truth."
-    }
+    Set-Location $repo.FullName
+    Write-Host "Execution locked: $((Get-Location).Path)"
 }
 else {
     Write-Host "Local CKS not found. Running standalone mode."
@@ -54,6 +46,7 @@ $download = Join-Path $Temp "CKS_E4_5_HANDSOFF_COLLECTOR.ps1"
 Invoke-WebRequest -Uri "$RawBase/$Tool" -OutFile $download
 
 Write-Host "Running collector..."
+
 if ($repo) {
     powershell -ExecutionPolicy Bypass -File $download -Workspace $repo.FullName
 }
