@@ -1,31 +1,39 @@
 # CKS E4.5 HANDSOFF COLLECTOR
+# Version: 1.2.0
 # Universal fallback workspace discovery.
 # No fixed machine path.
+# Priority: explicit context -> known workspaces -> current location -> fallback scan.
 
 $ErrorActionPreference = "Continue"
 
 $Roots = @(
     $env:CKS_WORKSPACE,
+    $env:WORKSPACE,
     "C:\git",
     "C:\Irvis-UPG\GIT",
     "C:\Projects",
     (Get-Location).Path
-) | Where-Object { $_ }
+) | Where-Object { $_ } | Select-Object -Unique
 
 $Repo = $null
 
 foreach ($root in $Roots) {
     if (Test-Path $root) {
+        if (Test-Path (Join-Path $root ".git")) {
+            $Repo = Get-Item $root
+            break
+        }
+
         $Repo = Get-ChildItem -Path $root -Directory -Recurse -Force -ErrorAction SilentlyContinue |
             Where-Object { Test-Path (Join-Path $_.FullName ".git") } |
             Select-Object -First 1
+
         if ($Repo) { break }
     }
 }
 
 if (-not $Repo) {
     Write-Host "FAILED: CKS repository not found"
-    Write-Host "Set CKS_WORKSPACE or clone repository first"
     exit 1
 }
 
@@ -43,7 +51,7 @@ function Run($name,$cmd) {
     Invoke-Expression $cmd 2>&1 | Tee-Object -FilePath $LogFile -Append
 }
 
-Log "CKS E4.5 HANDSOFF"
+Log "CKS E4.5 HANDSOFF COLLECTOR v1.2.0"
 Log "Repository: $RepoPath"
 Log "Time: $(Get-Date)"
 
@@ -61,5 +69,6 @@ if (Get-Command gh -ErrorAction SilentlyContinue) {
 }
 
 Log ""
+Log "VERSION=1.2.0"
 Log "LOG=$LogFile"
 Log "NEXT: python tools\cks_apply_branch_protection.py --dry-run"
