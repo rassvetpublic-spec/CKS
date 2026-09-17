@@ -95,8 +95,11 @@ def build_index(source: Path = SOURCE, root: Path = ROOT) -> dict[str, Any]:
             })
     items.sort(key=lambda item: (str(item.get("id") or ""), item["source"]))
     return {
-        "schema_version": "2.0",
+        "schema_version": "2.1",
         "derived_index": True,
+        "derived_artifact": True,
+        "ssot": False,
+        "generator": "cks_index_generator",
         "count": len(items),
         "parse_errors": parse_errors,
         "items": items,
