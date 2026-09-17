@@ -2,11 +2,12 @@
 
 Updated: 2026-09-17
 SSOT: `rassvetpublic-spec/CKS` -> `main`
-Overall status: **CLOSED — E1 through E3.4 verified**
+Historical audit status: **CLOSED — E1 through E3.4 verified**
+Successor governance work: **E4 active; verified through E4.4; E4.5 READY / EXTERNAL ADMIN AUTH BLOCKED**
 
-Purpose: keep the post-snapshot integrity audit recoverable without relying on chat context.
+Purpose: keep the post-snapshot integrity audit and its successor governance work recoverable without relying on chat context.
 
-## Checkpoint chain
+## Historical checkpoint chain
 
 | Stage | Status | Checkpoint / evidence | Commit / implementation head |
 |---|---|---|---|
@@ -27,7 +28,7 @@ Purpose: keep the post-snapshot integrity audit recoverable without relying on c
 | E3.3 | VERIFIED | `CKS_POST_SNAPSHOT_INTEGRITY_AUDIT_STAGE_E3_3_VERIFIED_2026-09-17.md` | migration `2d268b032966ada64a917ee5c8ce4d6d8984f4e4`, guard `c3d72f93696d7b7d7f2119b75670581d2595aa7a` |
 | E3.4 FINAL | VERIFIED / CLOSED | `CKS_POST_SNAPSHOT_INTEGRITY_AUDIT_STAGE_E3_4_FINAL_VERIFIED_2026-09-17.md` | implementation `6ec4945f890ae6c1815d27511be6dc5dfa4ba0a1`, checkpoint `d557c76a3c8ae2e19ce49f21e00c0dab1f144028` |
 
-## Audit chain
+## Historical audit chain
 
 ```text
 E1            false-green repair baseline            VERIFIED
@@ -39,18 +40,47 @@ E3.4          final post-snapshot meta-regression    VERIFIED
 POST-SNAPSHOT AUDIT                                  CLOSED
 ```
 
-## Residual debt intentionally outside the closed audit
+## Successor E4 governance chain
 
-- `cks-compliance.yml` vs `cks-knowledge-check.yml`: overlapping shallow structure checks, different trigger interfaces;
-- `cks-review-gate.yml` vs `cks-boundary-check.yml`: same review-gate engine, different trigger interfaces;
-- `cks-governance-runner.yml`: PR/manual interface only;
-- branch `main`: previously observed without branch protection / required status checks; policy change deferred to a separate governance task.
+The residual items previously listed outside the closed E3 audit were taken into E4 and are no longer merely deferred debt.
+
+```text
+E4.1  shared structural/review gates                 VERIFIED
+E4.2  Governance Runner v2                           VERIFIED
+E4.3  CKS v1.3 Implementation Package 003            VERIFIED
+E4.4  integrated live-main regression                VERIFIED
+E4.5  main branch protection                         READY / EXTERNAL ADMIN AUTH BLOCKED
+```
+
+Primary E4 recovery sources:
+
+- `CKS_E4_FULL_RECOVERY_SNAPSHOT_2026-09-17.md`
+- `CKS_E4_AUTONOMOUS_EXECUTION_LEDGER_2026-09-17.md`
+- `CKS_POST_SNAPSHOT_E4_4_INTEGRATED_REGRESSION_VERIFIED_2026-09-17.md`
+- `CKS_POST_SNAPSHOT_E4_5_BRANCH_PROTECTION_READY_BLOCKED_2026-09-17.md`
+- Issue #43
+- Issue #56
+
+## E4.5 remaining external action
+
+Current verified platform state remains unprotected:
+
+```text
+main.protected = false
+required status-check enforcement = off
+required contexts = []
+```
+
+The exact target policy, seven required checks, fail-safe helper, tests, admin-auth blocker and one-shot procedure are preserved in the E4 recovery documents above.
+
+Do not mark E4.5 VERIFIED until GitHub settings read-back proves the configured protection rule.
 
 ## Audit invariants
 
 1. GitHub `main` is the SSOT.
-2. Closed stages are not repeated unless new evidence invalidates them.
-3. Canon / Frozen Core v1.2 were not modified by this audit.
+2. Closed E1–E3.4 stages are not repeated unless new evidence invalidates them.
+3. Canon / Frozen Core v1.2 were not modified by the historical audit or E4 work.
 4. KAT9I_OS remains an external execution system; its state cannot become CKS Canon automatically.
 5. False-green fixes, integration semantics, dependency triggers and CI runtime migrations are protected by executable regression tests.
-6. The final E3.4 meta-regression is wired into `CKS Validation` and protects the combined E3 invariants.
+6. The final E3.4 meta-regression remains wired into `CKS Validation` and protects the combined E3 invariants.
+7. E4 continuation starts from live `main` and the durable E4 recovery documents, not from chat reconstruction.
