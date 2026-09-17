@@ -1,18 +1,28 @@
 # CKS HANDSOFF LOG UPLOADER
-# Uploads local diagnostic evidence back into repository without chat copy/paste.
+# Fallback mode: works with local git even when GitHub is temporarily unavailable.
 
 $ErrorActionPreference = "Continue"
 
-$Repo = "C:\Irvis-UPG\GIT\CKS"
-$Source = Join-Path $Repo "e4.5-evidence"
-$Target = Join-Path $Repo "e4.5-evidence\uploaded"
+$RepoCandidates = @(
+    "C:\Irvis-UPG\GIT\CKS",
+    (Get-Location).Path
+)
 
-if (!(Test-Path $Source)) {
-    Write-Host "No evidence directory found: $Source"
+$Repo = $RepoCandidates | Where-Object { Test-Path (Join-Path $_ ".git") } | Select-Object -First 1
+
+if (-not $Repo) {
+    Write-Host "FAILED: repository not found"
     exit 1
 }
 
-New-Item -ItemType Directory -Force -Path $Target | Out-Null
+Set-Location $Repo
+
+$Source = Join-Path $Repo "e4.5-evidence"
+
+if (!(Test-Path $Source)) {
+    Write-Host "No evidence folder: $Source"
+    exit 1
+}
 
 $files = Get-ChildItem $Source -Filter "*.log" -File
 
@@ -21,14 +31,23 @@ if ($files.Count -eq 0) {
     exit 0
 }
 
-foreach ($file in $files) {
-    Copy-Item $file.FullName $Target -Force
+$Archive = Join-Path $Source "uploaded"
+New-Item -ItemType Directory -Force -Path $Archive | Out-Null
+
+foreach ($f in $files) {
+    Copy-Item $f.FullName $Archive -Force
 }
 
-Set-Location $Repo
-
 git add e4.5-evidence/uploaded
-git commit -m "evidence: upload CKS E4.5 hands-off logs"
-git push
 
-Write-Host "Uploaded logs through GitHub"
+git commit -m "evidence: upload CKS E4.5 hands-off logs"
+
+$push = git push 2>&1
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "PUSH FAILED - evidence saved locally"
+    Write-Host $push
+    exit 2
+}
+
+Write-Host "UPLOAD COMPLETE THROUGH GITHUB"
