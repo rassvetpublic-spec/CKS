@@ -66,7 +66,7 @@ jobs:
 
       - name: Publish Knowledge Index artifact
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: cks-package003-knowledge-index
           path: artifacts/package003/knowledge-index.json
@@ -74,7 +74,7 @@ jobs:
 
       - name: Publish Migration Audit artifact
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: cks-package003-migration-audit
           path: artifacts/package003/migration-audit.json
@@ -82,7 +82,7 @@ jobs:
 
       - name: Publish Package 003 diagnostics
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: cks-package003-diagnostics
           path: |
