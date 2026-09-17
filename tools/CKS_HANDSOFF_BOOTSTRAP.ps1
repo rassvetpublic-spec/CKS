@@ -1,16 +1,20 @@
-# CKS HANDSOFF BOOTSTRAP v2.6
+# CKS HANDSOFF BOOTSTRAP v2.7
 # Single entry point. Core repository recovery only.
+param([switch]$Quiet)
+
 $ErrorActionPreference='Stop'
 [Console]::OutputEncoding=[System.Text.Encoding]::UTF8
 $OutputEncoding=[System.Text.Encoding]::UTF8
 
 $RepoUrl='https://github.com/rassvetpublic-spec/CKS.git'
 
-Write-Host 'CKS HANDSOFF v2.6'
-Write-Host "Time: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')"
+function Out($x){ if(-not $Quiet){ Write-Host $x } }
+
+Out 'CKS HANDSOFF v2.7'
+Out "Time: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')"
 
 if(-not (Get-Command git -ErrorAction SilentlyContinue)){throw 'git missing'}
-Write-Host 'git PASS'
+Out 'git PASS'
 
 $start=(Get-Location).Path
 $repoPath=$null
@@ -36,31 +40,43 @@ Set-Location $repoPath
 $remote=(git remote get-url origin).Trim()
 if($remote -notmatch 'rassvetpublic-spec/CKS'){throw "repo identity failed: $remote"}
 
-Write-Host "repo PASS $repoPath"
+Out "repo PASS $repoPath"
 git fetch origin main --quiet
 git checkout main --quiet
 git reset --hard origin/main --quiet
 
-Write-Host "branch PASS $(git branch --show-current)"
-Write-Host "HEAD PASS $(git rev-parse HEAD)"
+Out "branch PASS $(git branch --show-current)"
+Out "HEAD PASS $(git rev-parse HEAD)"
 
 foreach($a in @('README.md','control/system-state.yaml','docs/CKS_CURRENT_WORKING_STATE_SNAPSHOT_2026-09-17.md')){
- if(Test-Path $a){Write-Host "anchor PASS $a"}else{Write-Host "anchor MISSING $a"}
+ if(Test-Path $a){Out "anchor PASS $a"}else{Out "anchor MISSING $a"}
 }
 
-Write-Host 'SSOT DISCOVERY'
+# remove temporary clones from previous handsoff runs
+Get-ChildItem (Split-Path $repoPath -Parent) -Directory -Filter 'CKS.__handsoff_clone_*' -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+
+Out 'SSOT DISCOVERY'
 $patterns=@('GitHub `main`','recovery SSOT','CHAT_BOOTSTRAP','CURRENT_WORKING_STATE','ARCHITECTURE_DECISION')
-$seen=@{}
+$seen=@()
+$candidates=@()
 foreach($p in $patterns){
  Get-ChildItem docs -Recurse -File -ErrorAction SilentlyContinue |
  Select-String $p |
  ForEach-Object {
   $key="$($_.Path):$($_.LineNumber)"
-  if(-not $seen.ContainsKey($key)){
-   $seen[$key]=$true
-   Write-Host "SSOT $key"
+  if($seen -notcontains $key){
+   $seen += $key
+   $candidates += $_
+   Out "SSOT $key"
   }
  }
 }
 
-Write-Host 'DONE'
+$primary=$candidates | Where-Object {$_.Path -match 'CHAT_BOOTSTRAP'} | Select-Object -First 1
+if($primary){
+ Out "PRIMARY SSOT $($primary.Path):$($primary.LineNumber)"
+}else{
+ Out 'PRIMARY SSOT UNKNOWN'
+}
+
+Out 'DONE'
