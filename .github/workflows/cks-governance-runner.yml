@@ -1,6 +1,9 @@
 name: CKS Governance Runner
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
   workflow_dispatch:
 
@@ -9,5 +12,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Run governance validation
-        run: python tools/cks_governance_runner.py
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Run Governance Runner v2 regression tests
+        run: python -m unittest discover -s tests -p 'test_cks_governance_runner_v2.py' -v
+      - name: Run Governance Runner v2
+        run: python tools/cks_governance_runner.py --report artifacts/cks-governance/governance-report.json
+      - name: Upload governance report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: cks-governance-report
+          path: artifacts/cks-governance/
