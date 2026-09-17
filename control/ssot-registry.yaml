@@ -1,6 +1,12 @@
 ssot:
   architecture:
-    path: ARCHITECTURE.md
+    status: unresolved
+    issue: 29
+    candidates:
+      - ARCHITECTURE.md
+      - docs/ARCHITECTURE.md
+      - docs/architecture/
+    note: "Архитектурный SSoT не назначается автоматически по результатам аудита. Кандидаты перечислены для Decision по Issue #29."
   schemas:
     path: schemas/
   decisions:
