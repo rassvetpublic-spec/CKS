@@ -1,4 +1,4 @@
-# CKS HANDSOFF BOOTSTRAP v2.4
+# CKS HANDSOFF BOOTSTRAP v2.5
 # Single entry point. Core repository recovery only.
 $ErrorActionPreference='Stop'
 [Console]::OutputEncoding=[System.Text.Encoding]::UTF8
@@ -6,10 +6,11 @@ $OutputEncoding=[System.Text.Encoding]::UTF8
 
 $RepoUrl='https://github.com/rassvetpublic-spec/CKS.git'
 
-Write-Host 'CKS HANDSOFF v2.4'
+Write-Host 'CKS HANDSOFF v2.5'
 Write-Host "Time: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')"
 
-if(Get-Command git -ErrorAction SilentlyContinue){Write-Host 'git PASS'}else{throw 'git missing'}
+if(-not (Get-Command git -ErrorAction SilentlyContinue)){throw 'git missing'}
+Write-Host 'git PASS'
 
 $start=(Get-Location).Path
 $repoPath=$null
