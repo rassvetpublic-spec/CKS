@@ -1,6 +1,6 @@
 Clear-Host
 # CKS HANDSOFF BOOTSTRAP
-# Version: 1.3.3
+# Version: 1.3.4
 # Universal one-command entry point. Uses authenticated GitHub API content delivery.
 
 $ErrorActionPreference = "Stop"
@@ -9,7 +9,7 @@ $ToolPath = "tools/CKS_E4_5_HANDSOFF_COLLECTOR.ps1"
 $Temp = Join-Path $env:TEMP "CKS_HANDSOFF"
 New-Item -ItemType Directory -Force -Path $Temp | Out-Null
 
-Write-Host "CKS HANDSOFF BOOTSTRAP v1.3.3"
+Write-Host "CKS HANDSOFF BOOTSTRAP v1.3.4"
 Write-Host "Discovering environment..."
 
 $roots = @($env:CKS_WORKSPACE,(Get-Location).Path,"C:\git","C:\Irvis-UPG\GIT") | Where-Object { $_ } | Select-Object -Unique
@@ -29,7 +29,15 @@ $download = Join-Path $Temp "CKS_E4_5_HANDSOFF_COLLECTOR.ps1"
 Remove-Item $download -Force -ErrorAction SilentlyContinue
 
 Write-Host "Delivery: GitHub API content"
-$data = gh api "repos/$Repo/contents/$ToolPath" | ConvertFrom-Json
+$apiPath = "repos/$Repo/contents/$ToolPath"
+Write-Host "API: $apiPath"
+
+$raw = gh api $apiPath 2>&1
+if ($LASTEXITCODE -ne 0) {
+    throw "Collector API failed: $($raw -join ' ')"
+}
+
+$data = $raw | ConvertFrom-Json
 if (-not $data.content) { throw "Collector content missing" }
 
 $bytes = [Convert]::FromBase64String(($data.content -replace '\s',''))
