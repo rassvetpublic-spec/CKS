@@ -19,5 +19,11 @@ def validate_control_plane(root="."):
     return {"status": "PASS" if not missing else "FAIL", "missing": missing}
 
 
+def main() -> int:
+    result = validate_control_plane()
+    print(result)
+    return 0 if result["status"] == "PASS" else 1
+
+
 if __name__ == "__main__":
-    print(validate_control_plane())
+    raise SystemExit(main())
