@@ -1,11 +1,12 @@
-# CKS HANDSOFF BOOTSTRAP v2.2
+# CKS HANDSOFF BOOTSTRAP v2.3
 # Single entry point. No secondary downloads.
 $ErrorActionPreference='Stop'
 [Console]::OutputEncoding=[System.Text.Encoding]::UTF8
 $OutputEncoding=[System.Text.Encoding]::UTF8
 $RepoUrl='https://github.com/rassvetpublic-spec/CKS.git'
+$RepoName='rassvetpublic-spec/CKS'
 
-Write-Host 'CKS HANDSOFF v2.2'
+Write-Host 'CKS HANDSOFF v2.3'
 Write-Host "Time: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')"
 
 function Has-Cmd($name){[bool](Get-Command $name -ErrorAction SilentlyContinue)}
@@ -13,27 +14,29 @@ if(Has-Cmd git){Write-Host 'git PASS'}else{throw 'git missing'}
 if(Has-Cmd gh){Write-Host 'gh PASS'}else{Write-Host 'gh SKIP'}
 
 $start=(Get-Location).Path
+$repoPath=$null
 
-# Detect current CKS repository first. Prevent CKS\CKS nesting.
-if((Split-Path $start -Leaf) -eq 'CKS' -and (Test-Path (Join-Path $start '.git'))){
-    $repoPath=$start
-}else{
-    $candidate=Join-Path $start 'CKS'
-    if(Test-Path (Join-Path $candidate '.git')){
-        $repoPath=$candidate
-    }else{
-        $repoPath=$candidate
-        $tmp="$repoPath.__handsoff_clone_$PID"
-        if(Test-Path $tmp){Remove-Item $tmp -Recurse -Force}
-        git clone $RepoUrl $tmp
-        if($LASTEXITCODE -ne 0){throw 'clone failed'}
-        Move-Item $tmp $repoPath
-    }
+# Find valid local CKS first. Never create CKS\CKS.
+$scan=@($start,(Split-Path $start -Parent)) | Select-Object -Unique
+foreach($p in $scan){
+  if(Test-Path (Join-Path $p '.git')){
+    $url=(git -C $p remote get-url origin 2>$null)
+    if($url -match 'rassvetpublic-spec/CKS'){$repoPath=$p;break}
+  }
+}
+
+if(-not $repoPath){
+  $repoPath=Join-Path (Split-Path $start -Parent) 'CKS'
+  if(Test-Path $repoPath){throw "CKS exists but is not a git repository: $repoPath"}
+  $tmp="$repoPath.__handsoff_clone_$PID"
+  git clone $RepoUrl $tmp
+  if($LASTEXITCODE -ne 0){throw 'clone failed'}
+  Move-Item $tmp $repoPath
 }
 
 if((Split-Path $repoPath -Leaf) -ne 'CKS'){throw "invalid repo path: $repoPath"}
-
 Set-Location $repoPath
+
 $remote=(git remote get-url origin).Trim()
 if($remote -notmatch 'rassvetpublic-spec/CKS'){throw "repo identity failed: $remote"}
 
@@ -58,5 +61,4 @@ $patterns=@('GitHub `main`','recovery SSOT','CHAT_BOOTSTRAP','CURRENT_WORKING_ST
 foreach($p in $patterns){
  Get-ChildItem docs -Recurse -File -ErrorAction SilentlyContinue | Select-String $p | Select-Object -First 3 | ForEach-Object {Write-Host "SSOT $($_.Path):$($_.LineNumber)"}
 }
-
 Write-Host 'DONE'
