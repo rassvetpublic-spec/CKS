@@ -1,4 +1,6 @@
+import os
 import unittest
+from unittest.mock import patch
 
 from tools import cks_apply_branch_protection as helper
 
@@ -76,8 +78,8 @@ class BranchProtectionHelperE4Tests(unittest.TestCase):
             )
         )
 
-    def test_readback_match_requires_exact_contexts_pr_requirement_and_guardrails(self):
-        protection = {
+    def _matching_protection(self):
+        return {
             "required_status_checks": {
                 "strict": True,
                 "contexts": list(helper.REQUIRED_CHECKS),
@@ -92,10 +94,39 @@ class BranchProtectionHelperE4Tests(unittest.TestCase):
             "allow_force_pushes": {"enabled": False},
             "allow_deletions": {"enabled": False},
         }
+
+    def test_readback_match_requires_exact_contexts_pr_requirement_and_guardrails(self):
+        protection = self._matching_protection()
         self.assertTrue(helper.protection_matches(protection))
 
         protection["required_status_checks"]["contexts"].append("validate")
         self.assertFalse(helper.protection_matches(protection))
+
+    def test_existing_protection_preflight_accepts_none_and_matching_policy(self):
+        helper.validate_existing_protection(None)
+        helper.validate_existing_protection(self._matching_protection())
+
+    def test_existing_protection_preflight_rejects_different_policy_without_override(self):
+        protection = self._matching_protection()
+        protection["required_status_checks"]["strict"] = False
+        with self.assertRaises(helper.ProtectionError):
+            helper.validate_existing_protection(protection)
+
+    def test_existing_protection_preflight_allows_explicit_replace_override(self):
+        protection = self._matching_protection()
+        protection["required_status_checks"]["strict"] = False
+        helper.validate_existing_protection(protection, replace_existing=True)
+
+    def test_main_dry_run_fails_closed_on_different_existing_policy(self):
+        protection = self._matching_protection()
+        protection["required_status_checks"]["strict"] = False
+        branch = {"commit": {"sha": "abc123"}, "protected": True}
+        runs = [{"name": name} for name in helper.REQUIRED_CHECKS]
+        with patch.dict(os.environ, {"CKS_GITHUB_ADMIN_TOKEN": "test-token"}, clear=True), \
+             patch.object(helper, "get_branch", return_value=branch), \
+             patch.object(helper, "get_check_runs", return_value=runs), \
+             patch.object(helper, "get_protection", return_value=protection):
+            self.assertEqual(helper.main([]), 1)
 
 
 if __name__ == "__main__":
