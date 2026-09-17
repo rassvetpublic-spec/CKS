@@ -1,47 +1,65 @@
 # CKS E4.5 HANDSOFF COLLECTOR
-# Context-driven fallback collector. No fixed machine path.
+# Universal fallback workspace discovery.
+# No fixed machine path.
 
 $ErrorActionPreference = "Continue"
 
-function Find-Repo {
-    $roots = @()
-    if ($env:CKS_REPO) { $roots += $env:CKS_REPO }
-    $roots += (Get-Location).Path
-    $roots += "C:\Irvis-UPG\GIT"
-    $roots += "C:\git"
-    $roots += "C:\Projects"
+$Roots = @(
+    $env:CKS_WORKSPACE,
+    "C:\git",
+    "C:\Irvis-UPG\GIT",
+    "C:\Projects",
+    (Get-Location).Path
+) | Where-Object { $_ }
 
-    foreach ($root in $roots) {
-        if (Test-Path $root) {
-            $repo = Get-ChildItem $root -Directory -Recurse -Force -ErrorAction SilentlyContinue |
-                Where-Object { Test-Path (Join-Path $_.FullName '.git') } |
-                Select-Object -First 1
-            if ($repo) { return $repo.FullName }
-        }
+$Repo = $null
+
+foreach ($root in $Roots) {
+    if (Test-Path $root) {
+        $Repo = Get-ChildItem -Path $root -Directory -Recurse -Force -ErrorAction SilentlyContinue |
+            Where-Object { Test-Path (Join-Path $_.FullName ".git") } |
+            Select-Object -First 1
+        if ($Repo) { break }
     }
-    return $null
 }
 
-$Repo = Find-Repo
-if (-not $Repo) { Write-Host 'FAILED: repository not found'; exit 1 }
-Set-Location $Repo
+if (-not $Repo) {
+    Write-Host "FAILED: CKS repository not found"
+    Write-Host "Set CKS_WORKSPACE or clone repository first"
+    exit 1
+}
 
-$LogDir = Join-Path $Repo 'e4.5-evidence'
+$RepoPath = $Repo.FullName
+Set-Location $RepoPath
+
+$LogDir = Join-Path $RepoPath "e4.5-evidence"
 New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
-$LogFile = Join-Path $LogDir ("e45_collect_" + (Get-Date -Format 'yyyyMMdd_HHmmss') + '.log')
+$LogFile = Join-Path $LogDir ("e45_collect_" + (Get-Date -Format "yyyyMMdd_HHmmss") + ".log")
 
+function Log($x) { $x | Tee-Object -FilePath $LogFile -Append }
 function Run($name,$cmd) {
-    "===== $name =====" | Tee-Object -FilePath $LogFile -Append
+    Log ""
+    Log "===== $name ====="
     Invoke-Expression $cmd 2>&1 | Tee-Object -FilePath $LogFile -Append
 }
 
-"CKS E4.5 HANDSOFF" | Tee-Object -FilePath $LogFile
-"Repo=$Repo" | Tee-Object -FilePath $LogFile -Append
-Run 'git status' 'git status'
-Run 'branch' 'git branch --show-current'
-Run 'sha' 'git rev-parse HEAD'
-Run 'remote' 'git remote -v'
-Run 'python' 'python --version'
-Run 'helper' 'python tools\cks_apply_branch_protection.py --help'
+Log "CKS E4.5 HANDSOFF"
+Log "Repository: $RepoPath"
+Log "Time: $(Get-Date)"
 
-Write-Host "LOG=$LogFile"
+Run "git status" "git status"
+Run "branch" "git branch --show-current"
+Run "sha" "git rev-parse HEAD"
+Run "remote" "git remote -v"
+Run "python" "python --version"
+Run "helper" "python tools\cks_apply_branch_protection.py --help"
+
+if (Get-Command gh -ErrorAction SilentlyContinue) {
+    Run "gh auth" "gh auth status"
+} else {
+    Log "gh unavailable - fallback mode"
+}
+
+Log ""
+Log "LOG=$LogFile"
+Log "NEXT: python tools\cks_apply_branch_protection.py --dry-run"
