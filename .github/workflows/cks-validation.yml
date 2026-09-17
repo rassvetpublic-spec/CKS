@@ -17,6 +17,8 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+      - name: Guard GitHub Actions Node.js 24 migration
+        run: python -m unittest discover -s tests -p 'test_cks_github_actions_node24_stage_e3_3.py' -v
       - name: Validate CKS structure and contracts
         run: python tools/cks_ci.py --mode all
       - name: Upload CKS validation reports
