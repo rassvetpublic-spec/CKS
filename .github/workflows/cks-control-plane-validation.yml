@@ -9,5 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Verify validator exit semantics
+        run: python -m unittest discover -s tests -p 'test_cks_workflow_exit_semantics_stage_e3_2_a.py' -v
       - name: Validate control plane
         run: python validators/control_plane_validator.py
