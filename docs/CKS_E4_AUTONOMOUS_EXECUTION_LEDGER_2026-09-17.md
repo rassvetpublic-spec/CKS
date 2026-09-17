@@ -11,13 +11,11 @@ Related QA issue: #34
 - E1–E3.4: CLOSED / VERIFIED.
 - Original E4 baseline: `1ff433d7605ea5b8c3af3081436d25df7e746450`.
 - Canon / Frozen Core v1.2: DO NOT MODIFY.
-- Continue from live `main`; do not replay already implemented E4 work.
-- Preserve concurrent workers; no force updates or rollback.
-- Branch protection is the final E4 repository-governance action.
+- Continue from live `main`; preserve concurrent work; no force update/rollback.
 
 ## Worker coordination
 
-- This worker: E4.4 integrated verification and E4.5 branch protection.
+- This worker: E4.4 integrated verification + E4.5 branch protection.
 - Parallel worker: Package 003 internal consolidation / duplicate cleanup.
 - Before every write, re-read live `main`.
 
@@ -26,104 +24,111 @@ Related QA issue: #34
 | Stage | State | Evidence |
 |---|---|---|
 | E4.1 shared structural/review gates | VERIFIED | shared composite gates + regression coverage |
-| E4.2 Governance Runner v2 | VERIFIED | continuous push/PR/manual workflow + fail-closed tests |
-| E4.3 Package 003 executable completion | VERIFIED | canonical aggregate `cks-package-003-automation.yml`; PR and main runs green |
-| E4.4 integrated regression + live-main Review/Boundary gate | VERIFIED | checkpoint `CKS_POST_SNAPSHOT_E4_4_INTEGRATED_REGRESSION_VERIFIED_2026-09-17.md` |
-| E4.5 branch protection | IN PROGRESS / LAST | exact check names + protection mutation/read-back |
+| E4.2 Governance Runner v2 | VERIFIED | fail-closed runner + push/PR/manual CI |
+| E4.3 Package 003 executable completion | VERIFIED | canonical `cks-package-003-automation.yml`; PR/main evidence green |
+| E4.4 integrated regression | VERIFIED | `CKS_POST_SNAPSHOT_E4_4_INTEGRATED_REGRESSION_VERIFIED_2026-09-17.md` |
+| E4.5 branch protection | READY / BLOCKED BY ADMIN SURFACE | exact spec recorded; GitHub admin-write capability unavailable in current tools |
 
 ## E4.3 canonical Package 003 state
 
-The duplicate `.github/workflows/cks-package-003.yml` and its duplicate test were removed by the parallel worker.
-
-The canonical aggregate workflow is:
+Canonical aggregate:
 
 `.github/workflows/cks-package-003-automation.yml`
 
-It provides push / pull_request / manual execution and reuses the existing Package 003 implementations instead of duplicating their logic.
+The parallel worker removed only duplicate Package 003 workflow/test files. The canonical aggregate remains active and green.
 
-Package 003 remains 10/10 component-complete:
-
-1. GitHub Actions automation;
-2. JSON Schema validation;
-3. Knowledge Index generation;
-4. Traceability validation;
-5. Canon Guard;
-6. Issue/PR automation;
-7. Research/Core boundary;
-8. Migration Audit;
-9. full test/integration execution with zero-test protection;
-10. real Review/Governance gate execution plus evidence artifacts.
-
-Historical implementation evidence retained:
-
-- PR #55 aggregate run `35191031081`, job `105103425571` — SUCCESS;
-- metadata replacement run `35191093389`, job `105103611857` — SUCCESS;
-- main aggregate evidence run `35191230951`, job `105104036353` — SUCCESS.
+Package 003 remains 10/10 component-complete: Actions automation, real schema validation, derived Knowledge Index, Traceability, Canon Guard, Issue/PR automation, Research/Core boundary, advisory Migration Audit, full tests/integration with zero-test guard, and real Review/Governance execution plus evidence artifacts.
 
 ## E4.4 live-main integrated verification
 
-Verified pre-checkpoint live `main` head:
+Verified live head before checkpoint:
 
 `3414630eda64a23eaa032db0a0601c4c73a51c64`
 
-All 10 workflows created for that exact head completed with `success` and no failure:
+All 10 push workflows on that exact head completed SUCCESS:
 
-- CKS Package 003 Automation — `35192113935`
-- CKS Validation — `35192113941`
-- CKS Boundary Check — `35192113974`
-- CKS Canon Evidence Guard — `35192113858`
-- CKS Traceability Check — `35192113966`
-- CKS Governance Runner — `35192113867`
-- CKS Runtime Governance — `35192113918`
-- CKS Knowledge Check — `35192113938`
-- CKS Control Plane Validation — `35192113899`
-- CKS Bootstrap Check — `35192113900`
+- Package 003 Automation `35192113935`
+- Validation `35192113941`
+- Boundary `35192113974`
+- Canon `35192113858`
+- Traceability `35192113966`
+- Governance `35192113867`
+- Runtime Governance `35192113918`
+- Knowledge Check `35192113938`
+- Control Plane `35192113899`
+- Bootstrap `35192113900`
 
-Package 003 run `35192113935`, job `105106786775` (`Package 003 integrated automation gate`) passed every substantive step:
+Package 003 job `105106786775` passed its complete integrated chain. Validation job `105106786940` passed Node24, E3.4, Issue #34 false-green and full contracts validation.
 
-- workflow contract regression;
-- zero-test guard;
-- full unittest suite;
-- integration contract suite;
-- Knowledge Index;
-- Migration Audit;
-- Traceability Gate;
-- Canon Evidence Gate;
-- Review and Research/Core Boundary Gate;
-- Governance Runner v2;
-- evidence publication.
-
-Validation run `35192113941`, job `105106786940` passed:
-
-- Node.js 24 regression guard;
-- E3.4 final regression;
-- Issue #34 false-green regression;
-- complete CKS structure/contracts validation;
-- report publication.
-
-E4.4 durable checkpoint commit:
+Durable E4.4 checkpoint commit:
 
 `da199b804e5fffaa4f40cb0afbfa50186d3dfdd8`
 
-Checkpoint file:
+## E4.5 exact protection specification
 
-`docs/CKS_POST_SNAPSHOT_E4_4_INTEGRATED_REGRESSION_VERIFIED_2026-09-17.md`
+Unique required PR checks selected from actual GitHub check-run names:
 
-## Corrected audit findings retained
+1. `Package 003 integrated automation gate`
+2. `boundary`
+3. `canon-guard`
+4. `traceability`
+5. `governance`
+6. `validate-control-plane`
+7. `validate-bootstrap`
 
-- `knowledge/objects/distillate_workflow_analysis.yaml` is not a canonical-YAML bypass: current `cks_ci.py` explicitly recognizes typed `distillate_object` YAML and validates it through the dedicated distillate contract.
-- Package 003 duplicate cleanup did not remove the only aggregate gate; `CKS Package 003 Automation` remains active and green.
+Bare `validate` is deliberately excluded because two workflows emit that same check name.
+
+Desired protection:
+
+- pull request required before merge;
+- 0 mandatory approving reviews;
+- required status checks enabled;
+- branch must be up to date before merge;
+- seven unique checks above required;
+- force pushes disabled;
+- branch deletion disabled;
+- do not newly require signed commits, linear history, deployments, code-owner review, conversation resolution or mandatory approvals.
+
+## E4.5 current platform state
+
+Read-back shows:
+
+- `main.protected = false`;
+- required status-check enforcement = off;
+- required contexts = empty;
+- repository rulesets = `[]`.
+
+Mutation attempts/capability audit:
+
+- installed GitHub connector exposes protection/rulesets as read-only and has no administration-write action;
+- browser automation was rejected before reaching GitHub because strict-agent mode is unavailable; no GitHub change occurred;
+- local environment has no authenticated GitHub CLI session;
+- no second GitHub-admin plugin is available.
+
+No false claim of protection was made.
+
+Durable blocker/spec checkpoint:
+
+`docs/CKS_POST_SNAPSHOT_E4_5_BRANCH_PROTECTION_READY_BLOCKED_2026-09-17.md`
+
+commit `9d3dc2f5a268e19b5c1dc32b03f482c967daa022`.
+
+## E4.5 acceptance condition
+
+Change E4.5 to VERIFIED only after GitHub read-back proves:
+
+```text
+main.protected = true
+required status checks = enabled
+all seven unique contexts are required
+force pushes = disabled
+deletions = disabled
+```
+
+Until then E4 is functionally verified through E4.4, with one external repository-administration action outstanding.
 
 ## Canon / Frozen Core
 
 UNCHANGED throughout E4.
 
-## E4.5 — final remaining action
-
-1. Resolve exact PR check names suitable for required status checks.
-2. Enable protection for `main` without disabling the existing CI surface.
-3. Require stable PR checks; at minimum the Package 003 integrated gate plus core validation/governance checks.
-4. Read branch state back and prove `protected: true` with required checks enabled.
-5. Record final E4.5 checkpoint and close/update Issue #43.
-
-This ledger + Issue #43 remain the recovery SSOT; chat history is not required.
+This ledger + Issue #43 are the recovery SSOT; chat history is not required.
