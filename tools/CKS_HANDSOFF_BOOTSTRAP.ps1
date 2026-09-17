@@ -1,30 +1,28 @@
-# CKS HANDSOFF BOOTSTRAP v2.0.1
+# CKS HANDSOFF BOOTSTRAP v2.1
 # Single entry point. No secondary downloads.
 $ErrorActionPreference='Stop'
 [Console]::OutputEncoding=[System.Text.Encoding]::UTF8
+$OutputEncoding=[System.Text.Encoding]::UTF8
 $Repo='rassvetpublic-spec/CKS'
 $RepoUrl='https://github.com/rassvetpublic-spec/CKS.git'
 
-Write-Host 'CKS HANDSOFF v2.0.1'
+Write-Host 'CKS HANDSOFF v2.1'
 Write-Host "Time: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')"
 
-function Has-Cmd($name){ return [bool](Get-Command $name -ErrorAction SilentlyContinue) }
-
+function Has-Cmd($name){[bool](Get-Command $name -ErrorAction SilentlyContinue)}
 if(Has-Cmd git){Write-Host 'git PASS'}else{throw 'git missing'}
 if(Has-Cmd gh){Write-Host 'gh PASS'}else{Write-Host 'gh SKIP'}
 
 $start=(Get-Location).Path
 $repoPath=Join-Path $start 'CKS'
-
 $tmpDirs=Get-ChildItem $start -Directory -Filter 'CKS.__handsoff_clone_*' -ErrorAction SilentlyContinue
 foreach($d in $tmpDirs){Remove-Item $d.FullName -Recurse -Force}
 
-if(-not (Test-Path (Join-Path $repoPath '.git'))){
-  $tmp="$repoPath.__handsoff_clone_$PID"
-  if(Test-Path $tmp){Remove-Item $tmp -Recurse -Force}
-  git clone $RepoUrl $tmp
-  if($LASTEXITCODE -ne 0){throw 'clone failed'}
-  Move-Item $tmp $repoPath
+if(-not(Test-Path(Join-Path $repoPath '.git'))){
+ $tmp="$repoPath.__handsoff_clone_$PID"
+ git clone $RepoUrl $tmp
+ if($LASTEXITCODE -ne 0){throw 'clone failed'}
+ Move-Item $tmp $repoPath
 }
 
 Set-Location $repoPath
@@ -32,11 +30,9 @@ $remote=(git remote get-url origin).Trim()
 if($remote -notmatch 'rassvetpublic-spec/CKS'){throw "repo identity failed: $remote"}
 
 Write-Host "repo PASS $repoPath"
-
 git fetch origin main --quiet
 git checkout main --quiet
 git reset --hard origin/main --quiet
-
 Write-Host "branch PASS $(git branch --show-current)"
 Write-Host "HEAD PASS $(git rev-parse HEAD)"
 
@@ -50,6 +46,9 @@ try{
 }catch{Write-Host 'USD/RUB SKIP'}
 
 Write-Host 'SSOT DISCOVERY'
-Get-ChildItem docs -Recurse -File -ErrorAction SilentlyContinue | Select-String 'SSOT|Single Source of Truth' | Select-Object -First 20
+$patterns=@('GitHub `main`','recovery SSOT','CHAT_BOOTSTRAP','CURRENT_WORKING_STATE','ARCHITECTURE_DECISION')
+foreach($p in $patterns){
+ Get-ChildItem docs -Recurse -File -ErrorAction SilentlyContinue | Select-String $p | Select-Object -First 3 | ForEach-Object {Write-Host "SSOT $($_.Path):$($_.LineNumber)"}
+}
 
 Write-Host 'DONE'
