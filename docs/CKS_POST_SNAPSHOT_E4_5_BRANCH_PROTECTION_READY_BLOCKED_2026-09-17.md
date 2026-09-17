@@ -196,3 +196,17 @@ After that read-back:
 ## Worker coordination
 
 E4.5 remains owned by Worker A. The parallel Package 003 worker should not alter this protection specification unless a required check is intentionally renamed or removed; such a change requires re-running the reachability audit before applying protection.
+
+## Final persistence update — browser/API retry
+
+Additional evidence captured after the fail-safe handoff:
+
+- live `main` before this persistence pass had advanced through concurrent documentation work; the last read before the write was `bd965a3b586c0a6ea3d7395beffd052b7deda114`;
+- browser automation run `10fa0b7d-3070-4847-98ae-0889a112e8df` opened the repository branch-settings URL but GitHub presented an unauthenticated state (`Sign in` / settings URL not accessible); **no branch-protection mutation was saved**;
+- independent branch read-back still returned `main.protected = false`, required status-check enforcement off, and empty required contexts;
+- repository rulesets read-back remained `[]`;
+- direct branch-protection endpoint access through the installed integration returned `403 Resource not accessible by integration`, confirming the connector lacks the administration surface needed for the mutation/read-back endpoint;
+- plugin-directory verification found only the already-installed GitHub connector and no separate GitHub administration connector;
+- therefore there is no evidence of partial configuration and E4.5 remains `READY / EXTERNAL ADMIN AUTH BLOCKED / NOT APPLIED`.
+
+The authoritative continuation remains Issue #56 plus `tools/cks_apply_branch_protection.py`. Worker A lock remains active until an admin-capable execution applies the policy and GitHub read-back satisfies every acceptance condition above.
