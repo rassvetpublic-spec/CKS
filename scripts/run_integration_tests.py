@@ -13,10 +13,16 @@ TEST_PATTERN = "test_cks_*integration*.py"
 def run() -> dict:
     """Discover and execute integration tests, returning a compact result."""
 
+    # `tests/` is intentionally not required to be a Python package.  Keep the
+    # repository root importable for tests that import CKS scripts, while
+    # letting unittest treat the test directory itself as the discovery root.
+    root_text = str(ROOT)
+    if root_text not in sys.path:
+        sys.path.insert(0, root_text)
+
     suite = unittest.defaultTestLoader.discover(
         start_dir=str(TEST_DIR),
         pattern=TEST_PATTERN,
-        top_level_dir=str(ROOT),
     )
     test_count = suite.countTestCases()
 
