@@ -1,7 +1,7 @@
 Clear-Host
 # CKS HANDSOFF BOOTSTRAP
-# Version: 1.2.2
-# Universal one-command entry point with locked repository context.
+# Version: 1.2.3
+# Universal one-command entry point with locked repository context and cache bypass.
 
 $ErrorActionPreference = "Stop"
 
@@ -11,7 +11,7 @@ $Temp = Join-Path $env:TEMP "CKS_HANDSOFF"
 
 New-Item -ItemType Directory -Force -Path $Temp | Out-Null
 
-Write-Host "CKS HANDSOFF BOOTSTRAP v1.2.2"
+Write-Host "CKS HANDSOFF BOOTSTRAP v1.2.3"
 Write-Host "Discovering environment..."
 
 $roots = @(
@@ -47,7 +47,8 @@ else {
 }
 
 $download = Join-Path $Temp "CKS_E4_5_HANDSOFF_COLLECTOR.ps1"
-Invoke-WebRequest -Uri "$RawBase/$Tool" -OutFile $download
+$uri = "$RawBase/$Tool?nocache=$(Get-Date -Format yyyyMMddHHmmss)"
+Invoke-WebRequest -Uri $uri -OutFile $download
 
 Write-Host "Running collector..."
 
