@@ -1,18 +1,24 @@
-# CKS HANDSOFF BOOTSTRAP v2.0.0
-# One file entry point. No secondary downloads.
+# CKS HANDSOFF BOOTSTRAP v2.0.1
+# Single entry point. No secondary downloads.
 $ErrorActionPreference='Stop'
+[Console]::OutputEncoding=[System.Text.Encoding]::UTF8
 $Repo='rassvetpublic-spec/CKS'
 $RepoUrl='https://github.com/rassvetpublic-spec/CKS.git'
-Write-Host "CKS HANDSOFF v2.0.0"
+
+Write-Host 'CKS HANDSOFF v2.0.1'
 Write-Host "Time: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')"
 
-function Test-Cmd($n){ if(Get-Command $n -ErrorAction SilentlyContinue){'PASS'}else{'FAIL'} }
+function Has-Cmd($name){ return [bool](Get-Command $name -ErrorAction SilentlyContinue) }
 
-Write-Host "git $(Test-Cmd git)"
-Write-Host "gh $(Test-Cmd gh)"
+if(Has-Cmd git){Write-Host 'git PASS'}else{throw 'git missing'}
+if(Has-Cmd gh){Write-Host 'gh PASS'}else{Write-Host 'gh SKIP'}
 
-$root=(Get-Location).Path
-$repoPath=Join-Path $root 'CKS'
+$start=(Get-Location).Path
+$repoPath=Join-Path $start 'CKS'
+
+$tmpDirs=Get-ChildItem $start -Directory -Filter 'CKS.__handsoff_clone_*' -ErrorAction SilentlyContinue
+foreach($d in $tmpDirs){Remove-Item $d.FullName -Recurse -Force}
+
 if(-not (Test-Path (Join-Path $repoPath '.git'))){
   $tmp="$repoPath.__handsoff_clone_$PID"
   if(Test-Path $tmp){Remove-Item $tmp -Recurse -Force}
@@ -25,19 +31,18 @@ Set-Location $repoPath
 $remote=(git remote get-url origin).Trim()
 if($remote -notmatch 'rassvetpublic-spec/CKS'){throw "repo identity failed: $remote"}
 
-$head=(git rev-parse HEAD).Trim()
-$branch=(git branch --show-current).Trim()
 Write-Host "repo PASS $repoPath"
-Write-Host "branch PASS $branch"
-Write-Host "HEAD PASS $head"
 
 git fetch origin main --quiet
 git checkout main --quiet
-
 git reset --hard origin/main --quiet
 
-$anchors=@('README.md','control/system-state.yaml','docs/CKS_CURRENT_WORKING_STATE_SNAPSHOT_2026-09-17.md')
-foreach($a in $anchors){ if(Test-Path $a){Write-Host "anchor PASS $a"}else{Write-Host "anchor MISSING $a"}}
+Write-Host "branch PASS $(git branch --show-current)"
+Write-Host "HEAD PASS $(git rev-parse HEAD)"
+
+foreach($a in @('README.md','control/system-state.yaml','docs/CKS_CURRENT_WORKING_STATE_SNAPSHOT_2026-09-17.md')){
+ if(Test-Path $a){Write-Host "anchor PASS $a"}else{Write-Host "anchor MISSING $a"}
+}
 
 try{
  $cbr=Invoke-RestMethod 'https://www.cbr-xml-daily.ru/daily_json.js' -TimeoutSec 5
