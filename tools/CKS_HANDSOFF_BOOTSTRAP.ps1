@@ -1,15 +1,15 @@
 Clear-Host
 # CKS HANDSOFF BOOTSTRAP
-# Version: 1.2.4
-# Universal entry point with locked repo context and collector download fallback.
+# Version: 1.2.5
+# Universal one-command entry point with locked repo context and GitHub API fallback.
 
 $ErrorActionPreference = "Stop"
-$RawBase = "https://raw.githubusercontent.com/rassvetpublic-spec/CKS/main"
-$Tool = "tools/CKS_E4_5_HANDSOFF_COLLECTOR.ps1"
+$Repo = "rassvetpublic-spec/CKS"
+$ToolPath = "tools/CKS_E4_5_HANDSOFF_COLLECTOR.ps1"
 $Temp = Join-Path $env:TEMP "CKS_HANDSOFF"
 New-Item -ItemType Directory -Force -Path $Temp | Out-Null
 
-Write-Host "CKS HANDSOFF BOOTSTRAP v1.2.4"
+Write-Host "CKS HANDSOFF BOOTSTRAP v1.2.5"
 Write-Host "Discovering environment..."
 
 $roots = @($env:CKS_WORKSPACE,(Get-Location).Path,"C:\git","C:\Irvis-UPG\GIT","C:\Projects") | Where-Object { $_ } | Select-Object -Unique
@@ -29,16 +29,25 @@ if ($repo) {
 
 $download = Join-Path $Temp "CKS_E4_5_HANDSOFF_COLLECTOR.ps1"
 $ok = $false
-foreach ($uri in @("$RawBase/$Tool?nocache=$(Get-Date -Format yyyyMMddHHmmss)","https://github.com/rassvetpublic-spec/CKS/raw/main/$Tool")) {
+
+$urls = @(
+    "https://raw.githubusercontent.com/$Repo/main/$ToolPath",
+    "https://github.com/$Repo/raw/main/$ToolPath"
+)
+
+foreach ($uri in $urls) {
     try {
-        Invoke-WebRequest -Uri $uri -OutFile $download
+        Invoke-WebRequest -Uri "$uri?nocache=$(Get-Date -Format yyyyMMddHHmmss)" -OutFile $download
         $ok = $true
         break
     } catch {
-        Write-Host "Download fallback failed: $uri"
+        Write-Host "Download failed: $uri"
     }
 }
-if (-not $ok) { throw "Collector download failed" }
+
+if (-not $ok) {
+    throw "Collector download failed"
+}
 
 Write-Host "Running collector..."
 if ($repo) {
