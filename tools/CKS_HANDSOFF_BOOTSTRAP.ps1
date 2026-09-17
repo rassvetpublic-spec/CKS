@@ -1,4 +1,4 @@
-# CKS HANDSOFF BOOTSTRAP v2.5
+# CKS HANDSOFF BOOTSTRAP v2.6
 # Single entry point. Core repository recovery only.
 $ErrorActionPreference='Stop'
 [Console]::OutputEncoding=[System.Text.Encoding]::UTF8
@@ -6,7 +6,7 @@ $OutputEncoding=[System.Text.Encoding]::UTF8
 
 $RepoUrl='https://github.com/rassvetpublic-spec/CKS.git'
 
-Write-Host 'CKS HANDSOFF v2.5'
+Write-Host 'CKS HANDSOFF v2.6'
 Write-Host "Time: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')"
 
 if(-not (Get-Command git -ErrorAction SilentlyContinue)){throw 'git missing'}
@@ -50,11 +50,17 @@ foreach($a in @('README.md','control/system-state.yaml','docs/CKS_CURRENT_WORKIN
 
 Write-Host 'SSOT DISCOVERY'
 $patterns=@('GitHub `main`','recovery SSOT','CHAT_BOOTSTRAP','CURRENT_WORKING_STATE','ARCHITECTURE_DECISION')
+$seen=@{}
 foreach($p in $patterns){
  Get-ChildItem docs -Recurse -File -ErrorAction SilentlyContinue |
  Select-String $p |
- Select-Object -First 3 |
- ForEach-Object {Write-Host "SSOT $($_.Path):$($_.LineNumber)"}
+ ForEach-Object {
+  $key="$($_.Path):$($_.LineNumber)"
+  if(-not $seen.ContainsKey($key)){
+   $seen[$key]=$true
+   Write-Host "SSOT $key"
+  }
+ }
 }
 
 Write-Host 'DONE'
