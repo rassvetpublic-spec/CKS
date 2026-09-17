@@ -1,12 +1,11 @@
-# CKS HANDSOFF BOOTSTRAP v2.1
+# CKS HANDSOFF BOOTSTRAP v2.2
 # Single entry point. No secondary downloads.
 $ErrorActionPreference='Stop'
 [Console]::OutputEncoding=[System.Text.Encoding]::UTF8
 $OutputEncoding=[System.Text.Encoding]::UTF8
-$Repo='rassvetpublic-spec/CKS'
 $RepoUrl='https://github.com/rassvetpublic-spec/CKS.git'
 
-Write-Host 'CKS HANDSOFF v2.1'
+Write-Host 'CKS HANDSOFF v2.2'
 Write-Host "Time: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz')"
 
 function Has-Cmd($name){[bool](Get-Command $name -ErrorAction SilentlyContinue)}
@@ -14,16 +13,25 @@ if(Has-Cmd git){Write-Host 'git PASS'}else{throw 'git missing'}
 if(Has-Cmd gh){Write-Host 'gh PASS'}else{Write-Host 'gh SKIP'}
 
 $start=(Get-Location).Path
-$repoPath=Join-Path $start 'CKS'
-$tmpDirs=Get-ChildItem $start -Directory -Filter 'CKS.__handsoff_clone_*' -ErrorAction SilentlyContinue
-foreach($d in $tmpDirs){Remove-Item $d.FullName -Recurse -Force}
 
-if(-not(Test-Path(Join-Path $repoPath '.git'))){
- $tmp="$repoPath.__handsoff_clone_$PID"
- git clone $RepoUrl $tmp
- if($LASTEXITCODE -ne 0){throw 'clone failed'}
- Move-Item $tmp $repoPath
+# Detect current CKS repository first. Prevent CKS\CKS nesting.
+if((Split-Path $start -Leaf) -eq 'CKS' -and (Test-Path (Join-Path $start '.git'))){
+    $repoPath=$start
+}else{
+    $candidate=Join-Path $start 'CKS'
+    if(Test-Path (Join-Path $candidate '.git')){
+        $repoPath=$candidate
+    }else{
+        $repoPath=$candidate
+        $tmp="$repoPath.__handsoff_clone_$PID"
+        if(Test-Path $tmp){Remove-Item $tmp -Recurse -Force}
+        git clone $RepoUrl $tmp
+        if($LASTEXITCODE -ne 0){throw 'clone failed'}
+        Move-Item $tmp $repoPath
+    }
 }
+
+if((Split-Path $repoPath -Leaf) -ne 'CKS'){throw "invalid repo path: $repoPath"}
 
 Set-Location $repoPath
 $remote=(git remote get-url origin).Trim()
