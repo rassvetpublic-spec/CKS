@@ -1,7 +1,7 @@
 Clear-Host
 # CKS HANDSOFF BOOTSTRAP
-# Version: 1.2.1
-# Universal one-command entry point with execution context lock.
+# Version: 1.2.2
+# Universal one-command entry point with locked repository context.
 
 $ErrorActionPreference = "Stop"
 
@@ -11,20 +11,25 @@ $Temp = Join-Path $env:TEMP "CKS_HANDSOFF"
 
 New-Item -ItemType Directory -Force -Path $Temp | Out-Null
 
-Write-Host "CKS HANDSOFF BOOTSTRAP v1.2.1"
+Write-Host "CKS HANDSOFF BOOTSTRAP v1.2.2"
 Write-Host "Discovering environment..."
 
 $roots = @(
     $env:CKS_WORKSPACE,
     (Get-Location).Path,
     "C:\git",
-    "C:\Irvis-UPG\GIT"
+    "C:\Irvis-UPG\GIT",
+    "C:\Projects"
 ) | Where-Object { $_ } | Select-Object -Unique
 
 $repo = $null
-
 foreach ($root in $roots) {
     if (Test-Path $root) {
+        if ((Split-Path $root -Leaf) -eq "CKS" -and (Test-Path (Join-Path $root ".git"))) {
+            $repo = Get-Item $root
+            break
+        }
+
         $repo = Get-ChildItem -Path $root -Directory -Force -ErrorAction SilentlyContinue |
             Where-Object { $_.Name -eq "CKS" -and (Test-Path (Join-Path $_.FullName ".git")) } |
             Select-Object -First 1
@@ -35,8 +40,7 @@ foreach ($root in $roots) {
 
 if ($repo) {
     Write-Host "Local CKS found: $($repo.FullName)"
-    Set-Location $repo.FullName
-    Write-Host "Execution locked: $((Get-Location).Path)"
+    Write-Host "Execution locked: $($repo.FullName)"
 }
 else {
     Write-Host "Local CKS not found. Running standalone mode."
@@ -48,7 +52,7 @@ Invoke-WebRequest -Uri "$RawBase/$Tool" -OutFile $download
 Write-Host "Running collector..."
 
 if ($repo) {
-    powershell -ExecutionPolicy Bypass -File $download -Workspace $repo.FullName
+    powershell -ExecutionPolicy Bypass -File $download -RepoPath $repo.FullName
 }
 else {
     powershell -ExecutionPolicy Bypass -File $download
