@@ -1,6 +1,6 @@
 ssot:
   architecture:
-    path: architecture/
+    path: ARCHITECTURE.md
   schemas:
     path: schemas/
   decisions:
