@@ -9,6 +9,89 @@ from pathlib import Path
 from typing import Any
 
 
+ISSUE_TEMPLATE_PROFILES: dict[str, tuple[str, ...]] = {
+    "task": (
+        "## Goal",
+        "## Context",
+        "## Decision needed",
+        "## Evidence",
+        "## Acceptance criteria",
+    ),
+    "decision": (
+        "## Context",
+        "## Options",
+        "## Decision",
+        "## Evidence",
+        "## Status",
+    ),
+    "donor_audit": (
+        "## Donor System",
+        "## Purpose",
+        "## Extracted Patterns",
+        "## Rejected Elements",
+        "## Decision",
+    ),
+}
+
+ISSUE_TEMPLATE_SIGNATURES = {
+    "task": "## Goal",
+    "decision": "## Options",
+    "donor_audit": "## Donor System",
+}
+
+PR_TEMPLATE_MARKERS = (
+    "## Purpose",
+    "## Classification",
+    "## Validation",
+    "Context impact:",
+    "Canon impact:",
+    "Evidence:",
+)
+
+
+def _validate_issue_body(body: str, findings: list[dict[str, str]]) -> None:
+    """Validate known issue templates while keeping generic structured issues advisory."""
+
+    matched_profile = None
+    for profile, signature in ISSUE_TEMPLATE_SIGNATURES.items():
+        if signature in body:
+            matched_profile = profile
+            break
+
+    if matched_profile is None:
+        if "## " not in body:
+            findings.append({
+                "level": "WARN",
+                "code": "ISSUE_UNSTRUCTURED",
+                "message": "Issue body has no level-2 sections",
+            })
+        else:
+            findings.append({
+                "level": "WARN",
+                "code": "ISSUE_TEMPLATE_UNKNOWN",
+                "message": "Issue is structured but does not match a registered CKS issue template",
+            })
+        return
+
+    for marker in ISSUE_TEMPLATE_PROFILES[matched_profile]:
+        if marker not in body:
+            findings.append({
+                "level": "FAIL",
+                "code": "ISSUE_TEMPLATE_INCOMPLETE",
+                "message": f"{matched_profile} template is missing marker: {marker}",
+            })
+
+
+def _validate_pr_body(body: str, findings: list[dict[str, str]]) -> None:
+    for marker in PR_TEMPLATE_MARKERS:
+        if marker not in body:
+            findings.append({
+                "level": "FAIL",
+                "code": "PR_TEMPLATE_INCOMPLETE",
+                "message": f"Missing PR template marker: {marker}",
+            })
+
+
 def validate_event(event: dict[str, Any]) -> dict[str, Any]:
     findings: list[dict[str, str]] = []
     kind = "unknown"
@@ -31,24 +114,14 @@ def validate_event(event: dict[str, Any]) -> dict[str, Any]:
         if not body:
             findings.append({"level": "FAIL", "code": "BODY_MISSING", "message": "Body is required"})
         elif kind == "pull_request":
-            for marker in ("## Purpose", "## Classification", "## Validation", "Evidence:"):
-                if marker not in body:
-                    findings.append({
-                        "level": "FAIL",
-                        "code": "PR_TEMPLATE_INCOMPLETE",
-                        "message": f"Missing PR template marker: {marker}",
-                    })
-        elif kind == "issue" and "## " not in body:
-            findings.append({
-                "level": "WARN",
-                "code": "ISSUE_UNSTRUCTURED",
-                "message": "Issue body has no level-2 sections",
-            })
+            _validate_pr_body(body, findings)
+        elif kind == "issue":
+            _validate_issue_body(body, findings)
 
     failures = sum(1 for item in findings if item["level"] == "FAIL")
     warnings = sum(1 for item in findings if item["level"] == "WARN")
     return {
-        "schema_version": "1.0",
+        "schema_version": "1.1",
         "kind": kind,
         "status": "FAIL" if failures else ("WARN" if warnings else "PASS"),
         "summary": {"fail": failures, "warn": warnings},
