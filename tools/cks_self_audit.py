@@ -109,6 +109,7 @@ class SelfAudit:
         text = path.read_text(encoding="utf-8", errors="replace")
         for marker in (
             "architecture:",
+            "path: ARCHITECTURE.md",
             "schemas:",
             "decisions:",
             "knowledge:",
@@ -122,6 +123,8 @@ class SelfAudit:
         ):
             if marker not in text:
                 self.add("FAIL", "SSOT_REGISTRY_CONTRACT", rel, f"Нет обязательного признака SSOT: {marker}")
+        if not (self.root / "ARCHITECTURE.md").is_file():
+            self.add("FAIL", "SSOT_ARCHITECTURE_PATH", "ARCHITECTURE.md", "Реестр указывает архитектурный SSoT, но файл отсутствует")
         if not (self.root / "tools").is_dir():
             self.add("FAIL", "SSOT_RUNTIME_PATH", "tools/", "Реестр указывает runtime в tools/, но каталог отсутствует")
         if not (self.root / "engine").is_dir():
