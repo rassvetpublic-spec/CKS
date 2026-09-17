@@ -2,16 +2,44 @@ name: CKS v1.4 Validation
 
 on:
   pull_request:
+    paths:
+      - 'tools/cks_v1_4_*.py'
+      - 'tools/cks_compatibility_audit.py'
+      - 'tests/test_cks_post_snapshot_integrity_stage_e2.py'
+      - '.github/workflows/cks-v1.4-validation.yml'
   push:
     branches: [main]
+    paths:
+      - 'tools/cks_v1_4_*.py'
+      - 'tools/cks_compatibility_audit.py'
+      - 'tests/test_cks_post_snapshot_integrity_stage_e2.py'
+      - '.github/workflows/cks-v1.4-validation.yml'
+
+permissions:
+  contents: read
 
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Run CKS v1.4 validation
+      - name: Получить репозиторий
+        uses: actions/checkout@v4
+
+      - name: Настроить Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Проверить синтаксис v1.4 compatibility-модулей
         run: |
-          python tools/cks_v1_4_metrics_calculator.py
-          python tools/cks_v1_4_graph_builder.py
-          python tools/cks_v1_4_review_gate_runner.py
+          python -m py_compile tools/cks_v1_4_metrics_calculator.py
+          python -m py_compile tools/cks_v1_4_graph_builder.py
+          python -m py_compile tools/cks_v1_4_review_gate_runner.py
+          python -m py_compile tools/cks_v1_4_migration_adapter.py
+          python -m py_compile tools/cks_v1_4_dashboard_runtime.py
+
+      - name: Выполнить содержательную compatibility-регрессию
+        run: python -m unittest discover -s tests -p 'test_cks_post_snapshot_integrity_stage_e2.py' -v
+
+      - name: Проверить совместимость без пустых заглушек
+        run: python tools/cks_compatibility_audit.py
