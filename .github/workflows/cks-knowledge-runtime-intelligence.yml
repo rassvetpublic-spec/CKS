@@ -17,6 +17,14 @@ on:
       - 'tools/cks_governance_runner.py'
       - 'tools/cks_runtime_pipeline.py'
       - 'tools/cks_self_audit.py'
+      - 'tools/cks_compatibility_audit.py'
+      - 'tools/cks_v1_4_*.py'
+      - 'tools/cks_v1_6_intelligence_runtime.py'
+      - 'tools/cks_canon_conflict_detector.py'
+      - 'tools/cks_knowledge_health_score.py'
+      - 'tools/cks_v1_7_graph_validator.py'
+      - 'tools/cks_v1_7_orphan_node_detector.py'
+      - 'tools/cks_v1_7_relation_engine.py'
       - 'validators/lifecycle_guard.py'
       - 'schemas/cks-knowledge-object.schema.json'
       - 'schemas/cks-knowledge-view.schema.json'
@@ -34,6 +42,7 @@ on:
       - 'tests/test_cks_full_self_audit_stage7.py'
       - 'tests/test_cks_graph_evolution_stage_b.py'
       - 'tests/test_cks_graph_node_lifecycle_stage_d.py'
+      - 'tests/test_cks_post_snapshot_integrity_stage_e2.py'
       - '.github/workflows/cks-knowledge-runtime-intelligence.yml'
   pull_request:
     paths:
@@ -51,6 +60,14 @@ on:
       - 'tools/cks_governance_runner.py'
       - 'tools/cks_runtime_pipeline.py'
       - 'tools/cks_self_audit.py'
+      - 'tools/cks_compatibility_audit.py'
+      - 'tools/cks_v1_4_*.py'
+      - 'tools/cks_v1_6_intelligence_runtime.py'
+      - 'tools/cks_canon_conflict_detector.py'
+      - 'tools/cks_knowledge_health_score.py'
+      - 'tools/cks_v1_7_graph_validator.py'
+      - 'tools/cks_v1_7_orphan_node_detector.py'
+      - 'tools/cks_v1_7_relation_engine.py'
       - 'validators/lifecycle_guard.py'
       - 'schemas/cks-knowledge-object.schema.json'
       - 'schemas/cks-knowledge-view.schema.json'
@@ -68,6 +85,7 @@ on:
       - 'tests/test_cks_full_self_audit_stage7.py'
       - 'tests/test_cks_graph_evolution_stage_b.py'
       - 'tests/test_cks_graph_node_lifecycle_stage_d.py'
+      - 'tests/test_cks_post_snapshot_integrity_stage_e2.py'
       - '.github/workflows/cks-knowledge-runtime-intelligence.yml'
 
 permissions:
@@ -75,7 +93,7 @@ permissions:
 
 jobs:
   knowledge-runtime:
-    name: Проверка этапов 2–7 и графовых этапов B/D
+    name: Проверка этапов 2–7, B/D и пост-снимочного E2
     runs-on: ubuntu-latest
     steps:
       - name: Получить репозиторий
@@ -102,6 +120,10 @@ jobs:
           python -m py_compile tools/cks_governance_runner.py
           python -m py_compile tools/cks_runtime_pipeline.py
           python -m py_compile tools/cks_self_audit.py
+          python -m py_compile tools/cks_compatibility_audit.py
+          python -m py_compile tools/cks_v1_7_graph_validator.py
+          python -m py_compile tools/cks_v1_7_orphan_node_detector.py
+          python -m py_compile tools/cks_v1_7_relation_engine.py
           python -m py_compile validators/lifecycle_guard.py
 
       - name: Этап 2 — рабочий контур и состояния
@@ -130,6 +152,11 @@ jobs:
 
       - name: Этап D — жизненный цикл и версии узлов графа
         run: python -m unittest discover -s tests -p 'test_cks_graph_node_lifecycle_stage_d.py' -v
+
+      - name: Этап E2 — целостность compatibility-слоёв
+        run: |
+          python -m unittest discover -s tests -p 'test_cks_post_snapshot_integrity_stage_e2.py' -v
+          python tools/cks_compatibility_audit.py
 
       - name: Выполнить самопроверку CKS
         run: python tools/cks_self_audit.py --root . --report reports/knowledge-runtime-self-audit.json
