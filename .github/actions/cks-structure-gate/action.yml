@@ -1,0 +1,12 @@
+name: CKS Structure Gate
+description: Shared repository structure validation for CKS workflows
+runs:
+  using: composite
+  steps:
+    - name: Validate required CKS directories
+      shell: bash
+      run: |
+        set -euo pipefail
+        for dir in docs schemas protocols evidence decisions graveyard; do
+          test -d "$dir"
+        done
