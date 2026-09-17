@@ -1,0 +1,33 @@
+schema: cks
+version: 1.7
+object: knowledge_object
+id: solution-agy-standalone-db-restore-01
+type: solution
+project: agy
+lifecycle: canonical
+title: "AGY Standalone: Восстановление индекса бесед (SQLite + Protobuf)"
+source: "Worker Session (Antigravity Standalone Debug)"
+metadata:
+  _cks_node_versioning:
+    version: 1
+    history:
+      - event: created
+        reason: "Фиксация способа восстановления базы бесед"
+content: |
+  # Паттерн решения: Восстановление БД Antigravity Standalone
+  
+  **Контекст:**
+  Пользователь потерял истории бесед в UI приложения Antigravity Standalone. Изначально была попытка восстановить записи в `conversation_summaries.db`, установив `raw_summary = NULL` или используя шаблонный `raw_summary` для всех бесед.
+  
+  **Проблема:**
+  Бэкенд `language_server.exe` кэширует список бесед в `agyhub_summaries_proto.pb` на основе `conversation_summaries.db`. Однако он строго валидирует поле `raw_summary` (protobuf blob) против внутренних данных детальной базы беседы (`conversations/<id>.db`). Если `trajectory_id` внутри `raw_summary` не совпадает с `trajectory_id` внутри таблицы `trajectory_metadata_blob` (key='main') детальной базы, сервер молча бракует и удаляет строку из `conversation_summaries.db`. Кроме того, любые ручные изменения SQLite базы бесполезны при запущенном `language_server.exe` из-за in-memory кэширования.
+  
+  **Метод решения (Дистиллят):**
+  1. **Изоляция исполнения:** Все скрипты восстановления базы должны запускаться строго при полностью выключенном `language_server.exe`.
+  2. **Реверс-инжиниринг Protobuf:** Использование `blackboxprotobuf` для извлечения эталонного формата сообщения из рабочего `raw_summary`.
+  3. **Сбор истинных метаданных:** Чтение `conversations/*.db`, распаковка `trajectory_metadata_blob` для получения оригинального `trajectory_id`, `project_id`, `workspace_uris` и `parent_id`. Название извлекается из `transcript.jsonl`.
+  4. **Генерация индекса:** Подстановка правильных значений в эталонный protobuf-объект, сериализация и запись корректных строк обратно в `conversation_summaries.db`.
+  5. **Сброс кэша:** Удаление `agyhub_summaries_proto.pb` перед запуском приложения для принудительного создания свежего кэша из исправленной SQLite.
+  
+  **Дополнительно:** Для защиты от обновлений и запуска фоновой индексации `AppData/Local/Programs/antigravity` примонтирован через NTFS Junction (symlink) к `C:\GIT\AGY\app`.
+status: draft
