@@ -42,7 +42,8 @@ class Package003WorkflowTests(unittest.TestCase):
         self.assertIn("artifacts/package003/knowledge-index.json", self.text)
         self.assertIn("cks-package003-migration-audit", self.text)
         self.assertIn("artifacts/package003/migration-audit.json", self.text)
-        self.assertIn("actions/upload-artifact@v4", self.text)
+        self.assertIn("actions/upload-artifact@v6", self.text)
+        self.assertNotIn("actions/upload-artifact@v4", self.text)
 
     def test_workflow_does_not_write_canon_or_frozen_core(self):
         forbidden = [
