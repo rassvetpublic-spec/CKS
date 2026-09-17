@@ -1,0 +1,24 @@
+{
+  "id": "CKS-KNW-1701",
+  "type": "knowledge",
+  "title": "AGY Standalone: Восстановление индекса бесед (SQLite + Protobuf)",
+  "source": "Worker Session (Antigravity Standalone Debug)",
+  "content": "# Паттерн решения: Восстановление БД Antigravity Standalone\n\nКонтекст: пользователь потерял истории бесед в UI приложения Antigravity Standalone. Изначально была попытка восстановить записи в conversation_summaries.db, установив raw_summary = NULL или используя шаблонный raw_summary для всех бесед.\n\nПроблема: language_server.exe кэширует список бесед в agyhub_summaries_proto.pb на основе conversation_summaries.db и валидирует raw_summary против внутренних данных conversations/<id>.db. Если trajectory_id не совпадает с trajectory_metadata_blob (key='main'), сервер бракует строку. Ручные изменения SQLite при работающем language_server.exe также конфликтуют с in-memory кэшем.\n\nМетод решения: 1) запускать восстановление при полностью выключенном language_server.exe; 2) извлекать эталонную структуру protobuf из рабочего raw_summary; 3) читать истинные metadata из conversations/*.db и transcript.jsonl; 4) собирать корректный raw_summary и восстанавливать строки conversation_summaries.db; 5) удалить agyhub_summaries_proto.pb перед запуском для перестроения кэша.\n\nДополнительно: локальная установка Antigravity может быть связана с C:\\GIT\\AGY\\app через NTFS Junction для контролируемого окружения.",
+  "version": "1.7",
+  "status": "draft",
+  "owner": "agy",
+  "lifecycle": "validation",
+  "projects": ["AGY"],
+  "relations": [],
+  "evidence": [],
+  "history": [
+    {
+      "version": 1,
+      "status": "draft",
+      "reason": "Фиксация способа восстановления базы бесед",
+      "source": "Worker Session (Antigravity Standalone Debug)"
+    }
+  ],
+  "legacy_id": "solution-agy-standalone-db-restore-01",
+  "legacy_type": "solution"
+}

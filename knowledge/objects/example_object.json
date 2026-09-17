@@ -1,0 +1,15 @@
+{
+  "id": "CKS-KNW-001",
+  "type": "knowledge",
+  "title": "Example knowledge object",
+  "content": "Bootstrap 1.0 storage example",
+  "source": "CKS bootstrap test",
+  "version": "1.0.0",
+  "status": "draft",
+  "owner": "cks-bootstrap",
+  "lifecycle": "development",
+  "relations": [],
+  "evidence": [],
+  "history": [],
+  "legacy_type": "pattern"
+}

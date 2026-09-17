@@ -21,6 +21,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_cks_github_actions_node24_stage_e3_3.py' -v
       - name: Run E3.4 final post-snapshot regression
         run: python -m unittest discover -s tests -p 'test_cks_post_snapshot_final_regression_stage_e3_4.py' -v
+      - name: Run Issue 34 false-green regression
+        run: python -m unittest discover -s tests -p 'test_cks_issue34_false_green_regression.py' -v
       - name: Validate CKS structure and contracts
         run: python tools/cks_ci.py --mode all
       - name: Upload CKS validation reports

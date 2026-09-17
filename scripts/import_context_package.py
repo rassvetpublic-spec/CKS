@@ -1,10 +1,12 @@
 """Validate KAT9I_OS context packages before CKS ingestion.
 
 This module enforces the active v1 exchange contract without promoting or
-mutating knowledge in CKS.  It intentionally remains a validator only.
+mutating knowledge in CKS. It intentionally remains a validator only.
 """
 
 from datetime import datetime
+import json
+from pathlib import Path
 from typing import Any
 
 
@@ -52,6 +54,70 @@ def _is_datetime(value: Any) -> bool:
     except ValueError:
         return False
     return True
+
+
+def _parse_yaml_scalar(value: str) -> Any:
+    value = value.strip()
+    if not value:
+        return ""
+    if value.startswith("[") and value.endswith("]"):
+        parsed = json.loads(value)
+        if not isinstance(parsed, list):
+            raise ValueError("inline collection must be a list")
+        return parsed
+    if (value.startswith('"') and value.endswith('"')) or (value.startswith("'") and value.endswith("'")):
+        return value[1:-1]
+    lowered = value.lower()
+    if lowered == "true":
+        return True
+    if lowered == "false":
+        return False
+    if lowered in {"null", "none", "~"}:
+        return None
+    return value
+
+
+def load_context_package(path: str | Path) -> dict[str, Any]:
+    """Load the active flat context-package YAML contract fail-closed.
+
+    The exchange instance is intentionally flat. Both inline JSON-style lists
+    and ordinary YAML block lists are accepted. Nested mappings are rejected
+    explicitly instead of being silently misparsed by ad-hoc test code.
+    """
+
+    result: dict[str, Any] = {}
+    current_list_key: str | None = None
+    source = Path(path)
+
+    for line_number, raw in enumerate(source.read_text(encoding="utf-8").splitlines(), start=1):
+        stripped = raw.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+
+        if raw[0].isspace():
+            if current_list_key and stripped.startswith("-"):
+                result[current_list_key].append(_parse_yaml_scalar(stripped[1:].strip()))
+                continue
+            raise ValueError(f"line {line_number}: nested mapping is outside the active flat context-package contract")
+
+        current_list_key = None
+        if ":" not in raw:
+            raise ValueError(f"line {line_number}: expected key: value")
+        key, value = raw.split(":", 1)
+        key = key.strip()
+        if not key:
+            raise ValueError(f"line {line_number}: empty key")
+        if key in result:
+            raise ValueError(f"line {line_number}: duplicate key {key!r}")
+
+        value = value.strip()
+        if value == "":
+            result[key] = []
+            current_list_key = key
+        else:
+            result[key] = _parse_yaml_scalar(value)
+
+    return result
 
 
 def validate_package(package: dict) -> bool:

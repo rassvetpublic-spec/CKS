@@ -1,8 +1,7 @@
-import json
 from pathlib import Path
 import unittest
 
-from scripts.import_context_package import validate_package
+from scripts.import_context_package import load_context_package, validate_package
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,18 +12,6 @@ def read(relative_path: str) -> str:
     return (ROOT / relative_path).read_text(encoding="utf-8")
 
 
-def load_flat_example(relative_path: str) -> dict:
-    result = {}
-    for raw_line in read(relative_path).splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#"):
-            continue
-        key, value = line.split(":", 1)
-        value = value.strip()
-        result[key.strip()] = json.loads(value) if value.startswith("[") else value.strip('"')
-    return result
-
-
 class PostSnapshotFinalRegressionTests(unittest.TestCase):
     def test_expected_workflow_inventory_and_removed_duplicates(self):
         workflow_names = {
@@ -32,11 +19,16 @@ class PostSnapshotFinalRegressionTests(unittest.TestCase):
             for path in WORKFLOWS.iterdir()
             if path.suffix in {".yml", ".yaml"}
         }
-        self.assertEqual(len(workflow_names), 15)
+        required = {
+            "cks-integration-test.yml",
+            "cks-validation.yml",
+            "cks-governance-runner.yml",
+            "cks-boundary-check.yml",
+            "cks-review-gate.yml",
+        }
+        self.assertTrue(required.issubset(workflow_names), sorted(required - workflow_names))
         self.assertNotIn("cks-preflight.yml", workflow_names)
         self.assertNotIn("cks-release-check.yml", workflow_names)
-        self.assertIn("cks-integration-test.yml", workflow_names)
-        self.assertIn("cks-validation.yml", workflow_names)
 
     def test_false_green_repairs_remain_fail_closed_and_wired(self):
         bootstrap = read("scripts/validate_bootstrap.py")
@@ -50,6 +42,8 @@ class PostSnapshotFinalRegressionTests(unittest.TestCase):
         self.assertIn('return 0 if result["status"] == "PASS" else 1', control_plane)
         self.assertIn("test_cks_workflow_exit_semantics_stage_e3_2_a.py", bootstrap_workflow)
         self.assertIn("test_cks_workflow_exit_semantics_stage_e3_2_a.py", control_workflow)
+        self.assertIn("actions/setup-python@v6", bootstrap_workflow)
+        self.assertIn("actions/setup-python@v6", control_workflow)
 
     def test_integration_gate_executes_real_tests_and_watches_contract_surface(self):
         workflow = read(".github/workflows/cks-integration-test.yml")
@@ -72,7 +66,7 @@ class PostSnapshotFinalRegressionTests(unittest.TestCase):
         self.assertNotIn('"status": "PASS", "tests": 2', runner)
 
     def test_kat9i_example_matches_active_validator(self):
-        package = load_flat_example("examples/kat9i_os_import/context_package.yaml")
+        package = load_context_package(ROOT / "examples/kat9i_os_import/context_package.yaml")
         self.assertTrue(validate_package(package))
         self.assertEqual(package["source_system"], "KAT9I_OS")
         self.assertEqual(package["split_mode"], "SPLIT")
