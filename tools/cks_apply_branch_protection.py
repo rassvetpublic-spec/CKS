@@ -174,6 +174,19 @@ def protection_matches(
     )
 
 
+def validate_existing_protection(
+    protection: dict[str, Any] | None,
+    replace_existing: bool = False,
+) -> None:
+    if protection is None or protection_matches(protection):
+        return
+    if not replace_existing:
+        raise ProtectionError(
+            "A different branch-protection rule already exists. "
+            "Refusing to replace it without --replace-existing."
+        )
+
+
 def get_branch(repo: str, branch: str, token: str) -> dict[str, Any]:
     encoded = urllib.parse.quote(branch, safe="")
     status, body = api_request("GET", _api_url(repo, f"branches/{encoded}"), token)
@@ -227,14 +240,9 @@ def apply_protection(
     validate_check_surface(check_runs)
 
     current = get_protection(repo, branch, token)
-    if current is not None:
-        if protection_matches(current):
-            return current
-        if not replace_existing:
-            raise ProtectionError(
-                "A different branch-protection rule already exists. "
-                "Refusing to replace it without --replace-existing."
-            )
+    if current is not None and protection_matches(current):
+        return current
+    validate_existing_protection(current, replace_existing=replace_existing)
 
     payload = build_protection_payload()
     encoded = urllib.parse.quote(branch, safe="")
@@ -291,6 +299,7 @@ def main(argv: list[str] | None = None) -> int:
         check_runs = get_check_runs(args.repo, sha, token)
         validate_check_surface(check_runs)
         current = get_protection(args.repo, args.branch, token)
+        validate_existing_protection(current, replace_existing=args.replace_existing)
 
         plan = {
             "repo": args.repo,
@@ -298,14 +307,19 @@ def main(argv: list[str] | None = None) -> int:
             "head_sha": sha,
             "currently_protected": bool(branch_state.get("protected")),
             "current_required_contexts": protection_contexts(current),
+            "current_policy_matches_target": protection_matches(current),
             "desired_required_contexts": list(REQUIRED_CHECKS),
             "desired_payload": build_protection_payload(),
+            "replace_existing": bool(args.replace_existing),
             "apply": bool(args.apply),
         }
         print(json.dumps(plan, indent=2, ensure_ascii=False))
 
         if not args.apply:
-            print("DRY-RUN PASS: check surface is safe; no mutation performed")
+            print(
+                "DRY-RUN PASS: check surface and existing protection state are safe; "
+                "no mutation performed"
+            )
             return 0
 
         final_state = apply_protection(
