@@ -1,0 +1,67 @@
+name: CKS Package 003 Automation
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package-003:
+    name: Package 003 integrated automation gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Verify Package 003 workflow contract
+        run: python -m unittest discover -s tests -p 'test_cks_package_003_automation.py' -v
+
+      - name: Guard full-suite discovery against zero tests
+        run: |
+          python -c "import unittest; suite=unittest.defaultTestLoader.discover('tests', pattern='test_*.py'); count=suite.countTestCases(); print(f'discovered_tests={count}'); raise SystemExit(0 if count > 0 else 1)"
+
+      - name: Run full CKS unittest suite
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: Run integration contract suite
+        run: python scripts/run_integration_tests.py
+
+      - name: Generate derived Knowledge Index
+        run: python tools/cks_index_generator.py --source knowledge --output artifacts/cks-package-003/knowledge-index.json
+
+      - name: Run advisory Migration Audit
+        run: python tools/cks_migration_audit.py --root . --output artifacts/cks-package-003/migration-audit.json
+
+      - name: Run Traceability Gate
+        run: python tools/cks_ci.py --mode traceability
+
+      - name: Run Canon Evidence Gate
+        run: python tools/cks_ci.py --mode canon
+
+      - name: Run Review and Research-Core Boundary Gate
+        run: python tools/cks_ci.py --mode review-gate
+
+      - name: Run Governance Runner v2
+        run: python tools/cks_governance_runner.py --root . --report artifacts/cks-package-003/governance-report.json
+
+      - name: Upload Package 003 evidence
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: cks-package-003-evidence
+          path: |
+            artifacts/cks-package-003/
+            artifacts/cks-ci/
+          if-no-files-found: warn
