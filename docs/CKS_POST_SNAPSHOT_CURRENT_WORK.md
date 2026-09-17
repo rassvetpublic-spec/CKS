@@ -5,44 +5,46 @@ SSOT: GitHub `rassvetpublic-spec/CKS`, branch `main`
 
 ## Current stage
 
-`E3.4 — final post-snapshot regression`
+**CLOSED — post-snapshot integrity audit E1–E3.4 complete.**
 
-Previous verified checkpoints:
+Final verified checkpoint:
 
-- `docs/CKS_POST_SNAPSHOT_INTEGRITY_AUDIT_STAGE_E3_2_C2F3_VERIFIED_2026-09-17.md`
-- `docs/CKS_POST_SNAPSHOT_INTEGRITY_AUDIT_STAGE_E3_3_VERIFIED_2026-09-17.md`
+`docs/CKS_POST_SNAPSHOT_INTEGRITY_AUDIT_STAGE_E3_4_FINAL_VERIFIED_2026-09-17.md`
 
-Current index head before E3.4 implementation:
+Final functional verification head:
 
-`ca7ec16be3e7fad0c4546de437c0d3307831fb44`
+`6ec4945f890ae6c1815d27511be6dc5dfa4ba0a1`
 
-## Immediate sequence
+Final checkpoint commit:
+
+`d557c76a3c8ae2e19ce49f21e00c0dab1f144028`
+
+Closed audit index:
+
+`docs/CKS_POST_SNAPSHOT_AUDIT_INDEX.md`
+
+## Closed chain
 
 ```text
-E3.4 meta-regression test
-  -> wire into CKS Validation
-  -> automatic CI evidence
-  -> residual-overlap review
-  -> final VERIFIED checkpoint
-  -> close current-work marker
+E1    VERIFIED
+E2    VERIFIED
+E3.1  COMPLETE — 17/17 initial workflows inventoried
+E3.2  VERIFIED — false-green, trigger, redundancy and KAT9I integration repairs
+E3.3  VERIFIED — GitHub Actions migrated off Node.js-20 majors
+E3.4  VERIFIED — final combined meta-regression + automatic CI
 ```
 
-## E3.4 verification targets
+## Future work only — not an active continuation of E3
 
-- Preflight and Release Check workflows remain absent;
-- Bootstrap and Control Plane fail-closed semantics remain protected;
-- KAT9I_OS context-package integration remains executable and fail-closed;
-- KAT9I example remains aligned with the active contract;
-- knowledge-runtime trigger still includes `tools/cks_ci.py` in push and pull request paths;
-- GitHub Actions Node.js-24 migration guard remains green;
-- main validation, runtime governance, boundary, Canon evidence, traceability, bootstrap, control-plane and knowledge checks remain green;
-- no Canon / Frozen Core v1.2 modification is introduced.
+1. Decide whether to consolidate Compliance and Knowledge Check while preserving the desired trigger interface.
+2. Decide whether Review Gate and Boundary Check should remain separate named interfaces or become one reusable workflow.
+3. Decide whether Governance Runner needs an ordinary push-to-main trigger or should remain PR/manual only.
+4. Introduce branch protection / required status checks for `main` as an explicit repository-governance policy change.
+5. Consider extending the final meta-regression if new workflow families or exchange contracts are added.
 
-## Do not drift
+## Do not restart closed work without new contradictory evidence
 
-- do not redesign CKS;
-- do not repeat E1/E2 without contradictory evidence;
-- do not modify Canon / Frozen Core v1.2;
-- do not turn retained trigger-interface overlaps into speculative cleanup;
-- do not import KAT9I_OS raw runtime/history as knowledge;
-- do not permit direct external Canon mutation.
+- do not repeat E1/E2/E3 merely to reconstruct chat context;
+- use GitHub `main`, the closed audit index and the final E3.4 checkpoint as recovery sources;
+- do not modify Canon / Frozen Core v1.2 as part of historical audit maintenance;
+- preserve the CKS/KAT9I_OS boundary: no raw runtime/history import and no direct external Canon mutation.
