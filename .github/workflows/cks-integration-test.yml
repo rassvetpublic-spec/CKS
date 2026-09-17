@@ -1,7 +1,30 @@
 name: CKS Integration Test
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/cks-integration-test.yml"
+      - "schemas/context_package_kat9i_v1.yaml"
+      - "scripts/import_context_package.py"
+      - "scripts/run_integration_tests.py"
+      - "adapters/**"
+      - "protocols/ingestion_protocol.md"
+      - "protocols/context_split_protocol.md"
+      - "docs/CONTEXT_SPLIT_MODES.md"
+      - "tests/test_cks_context_package_integration_stage_e3_2_c2f2.py"
   pull_request:
+    paths:
+      - ".github/workflows/cks-integration-test.yml"
+      - "schemas/context_package_kat9i_v1.yaml"
+      - "scripts/import_context_package.py"
+      - "scripts/run_integration_tests.py"
+      - "adapters/**"
+      - "protocols/ingestion_protocol.md"
+      - "protocols/context_split_protocol.md"
+      - "docs/CONTEXT_SPLIT_MODES.md"
+      - "tests/test_cks_context_package_integration_stage_e3_2_c2f2.py"
   workflow_dispatch:
 
 jobs:
@@ -9,7 +32,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate CKS integration structure
-        run: |
-          test -f schemas/context_package_kat9i_v1.yaml
-          test -f scripts/import_context_package.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Execute CKS integration contract tests
+        run: python scripts/run_integration_tests.py
