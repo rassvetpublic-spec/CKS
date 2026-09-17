@@ -152,6 +152,11 @@ def pull_request_requirement_matches(protection: dict[str, Any] | None) -> bool:
     )
 
 
+def _protection_flag_enabled(protection: dict[str, Any], name: str) -> bool:
+    setting = protection.get(name) or {}
+    return bool(setting.get("enabled")) if isinstance(setting, dict) else bool(setting)
+
+
 def protection_matches(
     protection: dict[str, Any] | None,
     required_checks: Iterable[str] = REQUIRED_CHECKS,
@@ -161,16 +166,27 @@ def protection_matches(
     expected = sorted(required_checks)
     actual = sorted(protection_contexts(protection))
     strict = bool((protection.get("required_status_checks") or {}).get("strict"))
-    admins = bool((protection.get("enforce_admins") or {}).get("enabled"))
-    force_pushes = bool((protection.get("allow_force_pushes") or {}).get("enabled"))
-    deletions = bool((protection.get("allow_deletions") or {}).get("enabled"))
+    admins = _protection_flag_enabled(protection, "enforce_admins")
+    no_push_restrictions = protection.get("restrictions") is None
+    disabled_target_flags = (
+        "required_linear_history",
+        "allow_force_pushes",
+        "allow_deletions",
+        "block_creations",
+        "required_conversation_resolution",
+        "lock_branch",
+        "allow_fork_syncing",
+    )
     return (
         actual == expected
         and strict
         and admins
         and pull_request_requirement_matches(protection)
-        and not force_pushes
-        and not deletions
+        and no_push_restrictions
+        and all(
+            not _protection_flag_enabled(protection, name)
+            for name in disabled_target_flags
+        )
     )
 
 
