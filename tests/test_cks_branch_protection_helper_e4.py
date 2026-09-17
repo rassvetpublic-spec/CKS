@@ -44,16 +44,49 @@ class BranchProtectionHelperE4Tests(unittest.TestCase):
         )
         self.assertTrue(payload["required_status_checks"]["strict"])
         self.assertTrue(payload["enforce_admins"])
-        self.assertIsNone(payload["required_pull_request_reviews"])
+
+        reviews = payload["required_pull_request_reviews"]
+        self.assertIsInstance(reviews, dict)
+        self.assertEqual(reviews["required_approving_review_count"], 0)
+        self.assertFalse(reviews["dismiss_stale_reviews"])
+        self.assertFalse(reviews["require_code_owner_reviews"])
+        self.assertFalse(reviews["require_last_push_approval"])
+
         self.assertIsNone(payload["restrictions"])
         self.assertFalse(payload["allow_force_pushes"])
         self.assertFalse(payload["allow_deletions"])
 
-    def test_readback_match_requires_exact_contexts_and_guardrails(self):
+    def test_pull_request_requirement_rejects_null_or_approval_requirement(self):
+        self.assertFalse(helper.pull_request_requirement_matches({}))
+        self.assertFalse(
+            helper.pull_request_requirement_matches(
+                {"required_pull_request_reviews": None}
+            )
+        )
+        self.assertFalse(
+            helper.pull_request_requirement_matches(
+                {
+                    "required_pull_request_reviews": {
+                        "required_approving_review_count": 1,
+                        "dismiss_stale_reviews": False,
+                        "require_code_owner_reviews": False,
+                        "require_last_push_approval": False,
+                    }
+                }
+            )
+        )
+
+    def test_readback_match_requires_exact_contexts_pr_requirement_and_guardrails(self):
         protection = {
             "required_status_checks": {
                 "strict": True,
                 "contexts": list(helper.REQUIRED_CHECKS),
+            },
+            "required_pull_request_reviews": {
+                "required_approving_review_count": 0,
+                "dismiss_stale_reviews": False,
+                "require_code_owner_reviews": False,
+                "require_last_push_approval": False,
             },
             "enforce_admins": {"enabled": True},
             "allow_force_pushes": {"enabled": False},
