@@ -23,7 +23,7 @@ class BranchProtectionHelperE4Tests(unittest.TestCase):
         )
 
     def test_check_surface_accepts_exact_required_checks_even_with_unrelated_duplicate(self):
-        runs = [{"name": name} for name in helper.REQUIRED_CHECKS]
+        runs = [{"name": name, "_cks_producer_workflow_path": helper.EXPECTED_CHECK_WORKFLOWS[name]} for name in helper.REQUIRED_CHECKS]
         runs.extend([{"name": "validate"}, {"name": "validate"}])
         helper.validate_check_surface(runs)
 
@@ -33,7 +33,7 @@ class BranchProtectionHelperE4Tests(unittest.TestCase):
             helper.validate_check_surface(runs)
 
     def test_check_surface_rejects_ambiguous_required_check(self):
-        runs = [{"name": name} for name in helper.REQUIRED_CHECKS]
+        runs = [{"name": name, "_cks_producer_workflow_path": helper.EXPECTED_CHECK_WORKFLOWS[name]} for name in helper.REQUIRED_CHECKS]
         runs.append({"name": "boundary"})
         with self.assertRaises(helper.ProtectionError):
             helper.validate_check_surface(runs)
@@ -162,7 +162,7 @@ class BranchProtectionHelperE4Tests(unittest.TestCase):
         protection = self._matching_protection()
         protection["required_linear_history"]["enabled"] = True
         branch = {"commit": {"sha": "abc123"}, "protected": True}
-        runs = [{"name": name} for name in helper.REQUIRED_CHECKS]
+        runs = [{"name": name, "_cks_producer_workflow_path": helper.EXPECTED_CHECK_WORKFLOWS[name]} for name in helper.REQUIRED_CHECKS]
         with patch.dict(os.environ, {"CKS_GITHUB_ADMIN_TOKEN": "test-token"}, clear=True), \
              patch.object(helper, "get_branch", return_value=branch), \
              patch.object(helper, "get_check_runs", return_value=runs), \
@@ -172,3 +172,5 @@ class BranchProtectionHelperE4Tests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
