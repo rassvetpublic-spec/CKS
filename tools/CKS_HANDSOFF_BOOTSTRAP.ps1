@@ -1,13 +1,15 @@
 Clear-Host
 # CKS HANDSOFF BOOTSTRAP
-# Version: 1.2.6
-# Universal entry point. Locked repo context.
+# Version: 1.3.0
+# Universal entry point with GitHub API content fallback.
 
 $ErrorActionPreference = "Stop"
+$Repo = "rassvetpublic-spec/CKS"
+$ToolPath = "tools/CKS_E4_5_HANDSOFF_COLLECTOR.ps1"
 $Temp = Join-Path $env:TEMP "CKS_HANDSOFF"
 New-Item -ItemType Directory -Force -Path $Temp | Out-Null
 
-Write-Host "CKS HANDSOFF BOOTSTRAP v1.2.6"
+Write-Host "CKS HANDSOFF BOOTSTRAP v1.3.0"
 Write-Host "Discovering environment..."
 
 $roots = @($env:CKS_WORKSPACE,(Get-Location).Path,"C:\git","C:\Irvis-UPG\GIT","C:\Projects") | Where-Object { $_ } | Select-Object -Unique
@@ -26,16 +28,17 @@ if ($repo) {
 }
 
 $download = Join-Path $Temp "CKS_E4_5_HANDSOFF_COLLECTOR.ps1"
-$urls = @(
-"https://raw.githubusercontent.com/rassvetpublic-spec/CKS/main/tools/CKS_E4_5_HANDSOFF_COLLECTOR.ps1",
-"https://github.com/rassvetpublic-spec/CKS/raw/main/tools/CKS_E4_5_HANDSOFF_COLLECTOR.ps1"
-)
+$api = "https://api.github.com/repos/$Repo/contents/$ToolPath"
 
-$ok=$false
-foreach($uri in $urls){
-    try { Invoke-WebRequest -Uri "$uri?x=$(Get-Random)" -OutFile $download; $ok=$true; break } catch { }
+try {
+    $headers = @{ Accept = "application/vnd.github+json" }
+    $data = Invoke-RestMethod -Uri $api -Headers $headers
+    $bytes = [Convert]::FromBase64String($data.content)
+    [IO.File]::WriteAllBytes($download,$bytes)
 }
-if(-not $ok){ throw "Collector download failed" }
+catch {
+    throw "GitHub API collector download failed"
+}
 
 Write-Host "Running collector..."
 if($repo){ powershell -ExecutionPolicy Bypass -File $download -RepoPath $repo.FullName }
