@@ -1,8 +1,7 @@
 # CKS E4.5 HANDSOFF COLLECTOR
-# Version: 1.2.0
+# Version: 1.3.0
 # Universal fallback workspace discovery.
-# No fixed machine path.
-# Priority: explicit context -> known workspaces -> current location -> fallback scan.
+# Prefer CKS repository, avoid unrelated git repositories.
 
 $ErrorActionPreference = "Continue"
 
@@ -15,21 +14,23 @@ $Roots = @(
     (Get-Location).Path
 ) | Where-Object { $_ } | Select-Object -Unique
 
-$Repo = $null
+$Candidates = @()
 
 foreach ($root in $Roots) {
     if (Test-Path $root) {
         if (Test-Path (Join-Path $root ".git")) {
-            $Repo = Get-Item $root
-            break
+            $Candidates += Get-Item $root
         }
 
-        $Repo = Get-ChildItem -Path $root -Directory -Recurse -Force -ErrorAction SilentlyContinue |
-            Where-Object { Test-Path (Join-Path $_.FullName ".git") } |
-            Select-Object -First 1
-
-        if ($Repo) { break }
+        $Candidates += Get-ChildItem -Path $root -Directory -Recurse -Force -ErrorAction SilentlyContinue |
+            Where-Object { Test-Path (Join-Path $_.FullName ".git") }
     }
+}
+
+$Repo = $Candidates | Where-Object { $_.Name -eq "CKS" } | Select-Object -First 1
+
+if (-not $Repo) {
+    $Repo = $Candidates | Select-Object -First 1
 }
 
 if (-not $Repo) {
@@ -51,7 +52,7 @@ function Run($name,$cmd) {
     Invoke-Expression $cmd 2>&1 | Tee-Object -FilePath $LogFile -Append
 }
 
-Log "CKS E4.5 HANDSOFF COLLECTOR v1.2.0"
+Log "CKS E4.5 HANDSOFF COLLECTOR v1.3.0"
 Log "Repository: $RepoPath"
 Log "Time: $(Get-Date)"
 
@@ -69,6 +70,6 @@ if (Get-Command gh -ErrorAction SilentlyContinue) {
 }
 
 Log ""
-Log "VERSION=1.2.0"
+Log "VERSION=1.3.0"
 Log "LOG=$LogFile"
 Log "NEXT: python tools\cks_apply_branch_protection.py --dry-run"
