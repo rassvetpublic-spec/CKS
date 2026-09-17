@@ -1,7 +1,30 @@
 import copy
+import json
+from pathlib import Path
 import unittest
 
 from scripts.import_context_package import SUPPORTED_SPLIT_MODES, validate_package
+
+
+ROOT = Path(__file__).resolve().parents[1]
+EXAMPLE_PACKAGE = ROOT / "examples" / "kat9i_os_import" / "context_package.yaml"
+
+
+def load_flat_example(path: Path) -> dict:
+    """Load the deliberately flat example fixture without adding a YAML dependency."""
+
+    result = {}
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        key, value = line.split(":", 1)
+        value = value.strip()
+        if value.startswith("["):
+            result[key.strip()] = json.loads(value)
+        else:
+            result[key.strip()] = value.strip('"')
+    return result
 
 
 class ContextPackageContractTests(unittest.TestCase):
@@ -86,6 +109,14 @@ class ContextPackageContractTests(unittest.TestCase):
         before = copy.deepcopy(package)
         validate_package(package)
         self.assertEqual(package, before)
+
+    def test_repository_example_tracks_active_contract(self):
+        package = load_flat_example(EXAMPLE_PACKAGE)
+        self.assertTrue(validate_package(package))
+        self.assertEqual(package["source_system"], "KAT9I_OS")
+        self.assertEqual(package["split_mode"], "SPLIT")
+        self.assertNotIn("source", package)
+        self.assertEqual(package["artifacts"], ["decision.yaml", "evidence.yaml"])
 
 
 if __name__ == "__main__":
