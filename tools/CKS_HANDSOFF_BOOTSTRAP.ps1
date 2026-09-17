@@ -1,6 +1,6 @@
 Clear-Host
 # CKS HANDSOFF BOOTSTRAP
-# Version: 1.3.2
+# Version: 1.3.3
 # Universal one-command entry point. Uses authenticated GitHub API content delivery.
 
 $ErrorActionPreference = "Stop"
@@ -9,13 +9,13 @@ $ToolPath = "tools/CKS_E4_5_HANDSOFF_COLLECTOR.ps1"
 $Temp = Join-Path $env:TEMP "CKS_HANDSOFF"
 New-Item -ItemType Directory -Force -Path $Temp | Out-Null
 
-Write-Host "CKS HANDSOFF BOOTSTRAP v1.3.2"
+Write-Host "CKS HANDSOFF BOOTSTRAP v1.3.3"
 Write-Host "Discovering environment..."
 
 $roots = @($env:CKS_WORKSPACE,(Get-Location).Path,"C:\git","C:\Irvis-UPG\GIT") | Where-Object { $_ } | Select-Object -Unique
 $repo = $null
 foreach ($root in $roots) {
-    if (Test-Path (Join-Path $root ".git") -and (Split-Path $root -Leaf) -eq "CKS") { $repo = Get-Item $root; break }
+    if ((Test-Path (Join-Path $root ".git")) -and ((Split-Path $root -Leaf) -eq "CKS")) { $repo = Get-Item $root; break }
     $candidate = Join-Path $root "CKS"
     if (Test-Path (Join-Path $candidate ".git")) { $repo = Get-Item $candidate; break }
 }
