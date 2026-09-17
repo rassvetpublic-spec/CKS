@@ -1,5 +1,6 @@
+Clear-Host
 # CKS HANDSOFF BOOTSTRAP
-# Version: 1.0.0
+# Version: 1.0.1
 # Universal one-command entry point.
 
 $ErrorActionPreference = "Stop"
@@ -11,7 +12,7 @@ $Temp = Join-Path $env:TEMP "CKS_HANDSOFF"
 
 New-Item -ItemType Directory -Force -Path $Temp | Out-Null
 
-Write-Host "CKS HANDSOFF BOOTSTRAP v1.0.0"
+Write-Host "CKS HANDSOFF BOOTSTRAP v1.0.1"
 Write-Host "Discovering environment..."
 
 $roots = @(
