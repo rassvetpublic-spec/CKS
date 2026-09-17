@@ -126,8 +126,9 @@ Canonical aggregate on the corrected helper head:
 
 ## E4.5 current platform state
 
-Latest read-back before this ledger update still shows:
+Latest read-back before this ledger update shows:
 
+- live `main` immediately before the ledger persistence write: `b99e6c68c0948bc984527df2b7ed2db2dbbc9395`;
 - `main.protected = false`;
 - required status-check enforcement = off;
 - required contexts = empty;
@@ -136,12 +137,14 @@ Latest read-back before this ledger update still shows:
 Mutation attempts/capability audit:
 
 - installed GitHub connector exposes protection/rulesets read-only and has no administration-write action;
+- direct branch-protection endpoint access through the installed integration returns `403 Resource not accessible by integration`;
 - browser automation with the normal profile had no authenticated GitHub session; no mutation occurred;
+- browser automation run `10fa0b7d-3070-4847-98ae-0889a112e8df` independently reproduced that condition: GitHub branch settings were not accessible without sign-in and no partial rule was saved;
 - browser automation with vault enabled had no stored GitHub credentials; no mutation occurred;
 - local execution environment has no authenticated administrator GitHub CLI/token path available to Worker A;
-- no second GitHub-admin plugin is available.
+- plugin-directory verification found only the already-installed GitHub connector and no second GitHub-admin plugin.
 
-No false claim of protection was made.
+No false claim of protection was made and no evidence of partial protection exists.
 
 Durable blocker/spec checkpoint:
 
@@ -149,7 +152,7 @@ Durable blocker/spec checkpoint:
 
 Latest handoff-spec update commit:
 
-`32aee40e6cc24a1d7d13c1992e5b82fe14ab855a`
+`b99e6c68c0948bc984527df2b7ed2db2dbbc9395`
 
 ## One-shot admin handoff
 
@@ -165,6 +168,21 @@ Remove-Item Env:CKS_GITHUB_ADMIN_TOKEN
 ```
 
 First invocation is a live dry-run. `--apply` performs the mutation only after the live check surface passes preflight. A different pre-existing protection rule causes a fail-closed exit unless `--replace-existing` is deliberately supplied after review.
+
+## Persistence checkpoint — 2026-09-17
+
+The following state is now intentionally duplicated across durable recovery surfaces so a new chat can resume without relying on conversation memory:
+
+- E4.1–E4.4 = VERIFIED;
+- E4.5 = READY / EXTERNAL ADMIN AUTH BLOCKED / NOT APPLIED;
+- exact seven required check names are frozen above;
+- bare `validate` remains excluded due duplicate producers;
+- fail-safe helper and regression test are in `main`;
+- Issue #56 is the canonical administrative handoff;
+- branch read-back remains `protected:false` with enforcement off and no required contexts;
+- rulesets remain empty;
+- the browser and connector paths cannot currently perform the administration write;
+- Worker A ownership/lock remains active until successful protection read-back.
 
 ## E4.5 acceptance condition
 
