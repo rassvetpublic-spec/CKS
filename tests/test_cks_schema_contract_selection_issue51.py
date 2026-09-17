@@ -36,7 +36,7 @@ class TestSchemaContractSelectionIssue51(unittest.TestCase):
             text,
         )
         self.assertIn(
-            "для **любого нового универсального объекта знания CKS** использовать только "
+            "Для **любого нового универсального объекта знания CKS** использовать только "
             "`schemas/cks-knowledge-object.schema.json`",
             text,
         )
