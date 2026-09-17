@@ -1,0 +1,27 @@
+name: CKS Issue PR Automation
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Validate Issue or PR metadata
+        run: python tools/cks_issue_pr_guard.py --event "$GITHUB_EVENT_PATH" --report artifacts/cks-issue-pr/event-validation.json
+      - name: Upload Issue PR validation report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: cks-issue-pr-validation
+          path: artifacts/cks-issue-pr/
