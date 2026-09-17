@@ -1,6 +1,6 @@
-schema: context_package_v1
 id: KAT9I-IMPORT-001
-source: KAT9I_OS
-content_type: architecture_context
-split_mode: CONTEXT_SPLIT
-status: candidate
+source_system: KAT9I_OS
+source_reference: kat9i://example/kat9i-os-import-001
+created_at: "2026-09-17T00:00:00Z"
+split_mode: SPLIT
+artifacts: ["decision.yaml", "evidence.yaml"]
