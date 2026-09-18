@@ -1,32 +1,36 @@
-# CKS PR Intake Protocol v1
+# Протокол приёма pull-реквестов CKS v1 (CKS PR Intake Protocol v1)
 
-## Purpose
+## Назначение (Purpose)
 
-Define the handling path for pull requests that are created without a linked Issue.
+Определение порядка обработки pull-реквестов (`PR`), созданных без связанной задачи (`Issue`).
 
-PR-first work must enter the same lifecycle as Issue-first work.
+Работа, начатая с PR (`PR-first`), должна входить в тот же жизненный цикл, что и работа, начатая с задачи (`Issue-first`).
 
-## Flows
+## Потоки исполнения (Flows)
 
-### Issue-first
+### Начало с задачи (Issue-first)
 
+```text
 Issue → HANDOFF → Worker → PR → Decision → Merge
+```
 
-### PR-first
+### Начало с PR (PR-first)
 
-PR → PR Intake → linked Issue → HANDOFF → Worker → Decision → Merge
+```text
+PR → PR Intake → Связанная Issue → HANDOFF → Worker → Decision → Merge
+```
 
-## PR without Issue
+## Обработка PR без связанной Issue (PR without Issue)
 
-When a PR has no source Issue:
+Если PR не имеет исходной задачи:
 
-1. Create PR Intake Issue.
-2. Link PR and Issue.
-3. Add HANDOFF metadata.
-4. Classify the task.
-5. Continue through normal review lifecycle.
+1. Создать задачу приёма PR (`PR Intake Issue`).
+2. Связать PR и созданную Issue.
+3. Добавить метаданные передачи состояния `HANDOFF`.
+4. Классифицировать задачу (по шкале `ABC/XYZ`, сложности и риску).
+5. Продолжить работу по стандартному жизненному циклу ревью.
 
-## PR Intake Template
+## Шаблон приёма PR (PR Intake Template)
 
 ```md
 # PR Intake
@@ -67,21 +71,21 @@ BLOCKERS:
 NEXT:
 ```
 
-## Metrics
+## Метрики (Metrics)
 
-Required:
+Обязательные показатели:
 
-- complexity
-- risk
-- ABC/XYZ
-- evidence coverage
-- traceability
-- protocol compliance
+- Сложность (`Complexity`)
+- Риск (`Risk`)
+- Классификатор `ABC/XYZ`
+- Покрытие доказательствами (`Evidence coverage`)
+- Трассируемость (`Traceability`)
+- Соответствие протоколам (`Protocol compliance`)
 
-## Model Policy
+## Политика моделей (Model Policy)
 
-Model selection remains optional.
+Выбор конкретной модели остаётся опциональным.
 
-Any Worker may take any task.
+Любой воркер (`Worker`) может взять любую задачу при наличии доступа.
 
-Future Model Recommendation is a separate v2 capability.
+Рекомендация моделей (`Model Recommendation`) выделена в отдельную функциональность v2.
