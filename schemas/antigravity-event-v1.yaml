@@ -1,0 +1,21 @@
+version: Antigravity_Event_v1
+
+fields:
+  - event
+  - timestamp
+  - source
+  - payload
+  - evidence_reference
+
+rules:
+  gui:
+    can_display_state: true
+    can_change_canon: false
+    can_make_decisions: false
+
+flow:
+  - GAP
+  - Evidence
+  - Proposal
+  - Decision
+  - Minimal Change
