@@ -1,46 +1,52 @@
 # CKS Package Governance Model
 
-## Principle
+## Назначение
 
-CKS work is organized into enlarged semantic packages.
+Документ описывает управление укрупнёнными пакетами изменений в CKS.
 
-One package contains:
+Цель модели — снизить избыточную бюрократическую нагрузку и количество промежуточных подтверждений при безусловном сохранении:
+- traceability (трассируемости);
+- evidence (доказательств);
+- архитектурного контроля (architecture control);
+- истории решений (history of decisions).
 
-- research;
-- design decisions;
-- implementation;
-- verification;
-- evidence;
-- final result.
+## Принцип укрупнения
 
-## Completion model
+Работа в CKS организуется в виде укрупнённых смысловых пакетов (enlarged semantic packages). Связанные изменения, направленные на одну архитектурную цель, выполняются как один пакет:
 
-PACKAGE
+- цель;
+- границы;
+- решения;
+- реализация;
+- проверки;
+- evidence (доказательства);
+- итоговый отчёт.
 
-↓
+## Уровни пакетов (Package levels)
 
-WORK + TESTS + EVIDENCE
+Классификация масштаба и рисков пакетов изменений:
 
-↓
+- SMALL — рутинные и точечные изменения;
+- MEDIUM — изменения процессов и документации;
+- LARGE — многокомпонентные изменения кодовой базы и подсистем;
+- ARCHITECTURE — изменения архитектурных границ, Canon или SSOT.
 
-FINAL REPORT
+## Жизненный цикл
 
-↓
+IDEA
 
-ONE COMPLETION CONFIRMATION
+→ PACKAGE
 
-## Purpose
+→ EXECUTION
 
-Reduce unnecessary intermediate confirmations while preserving:
+→ VERIFICATION
 
-- traceability;
-- evidence;
-- architecture control;
-- history of decisions.
+→ FINAL REPORT
 
-## Package levels
+→ CLOSED
 
-- SMALL — routine changes;
-- MEDIUM — process and documentation changes;
-- LARGE — multi-component changes;
-- ARCHITECTURE — boundary, Canon, or SSOT changes.
+## Правило завершения
+
+Один укрупнённый пакет получает один итоговый статус завершения (one completion confirmation).
+
+Контроль сохраняется через проверки и доказательства, а не через большое количество промежуточных подтверждений.
