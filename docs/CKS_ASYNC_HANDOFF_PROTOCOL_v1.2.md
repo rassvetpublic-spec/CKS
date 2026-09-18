@@ -23,6 +23,8 @@ HISTORY
 - VERDICT is valid only for the exact SHA.
 - New SHA invalidates previous verdict.
 - Commit is used only for repository changes, not state exchange.
+- Every HANDOFF task must define the repository and return channel.
+- Worker results must return through the declared GitHub PR conversation channel.
 
 ## Model
 
@@ -30,4 +32,5 @@ PR = work object
 HANDOFF = state transfer
 EVIDENCE = proof
 VERDICT = decision
+CHANNEL = return path for execution feedback
 HISTORY = recorded knowledge
