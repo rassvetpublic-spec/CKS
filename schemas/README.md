@@ -36,6 +36,7 @@ LEGACY_KNOWLEDGE_OBJECT_CONTRACT = schemas/knowledge_object_v1.yaml
 |---|---|---|
 | `agent_report_v1.yaml` | ACTIVE | Контракт `agent_report`; отдельная сущность. |
 | `agent_task_v1.yaml` | ACTIVE | Контракт `agent_task`; отдельная сущность. |
+| `antigravity-event-v1.yaml` | ACTIVE | Контракт событий GUI Antigravity для интеграции с KAT9I_OS без мутации Canon CKS. |
 | `artifact_contract_v1.yaml` | ACTIVE | Контракт артефакта и его lifecycle-ограничений. |
 | `audit_report_v1.yaml` | ACTIVE | Контракт результата аудита. |
 | `candidate_object_v1.yaml` | ACTIVE | Контракт объекта-кандидата. |
