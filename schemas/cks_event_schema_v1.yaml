@@ -1,0 +1,44 @@
+version: 1.0
+schema_name: cks_event_schema_v1
+purpose: Define unified lightweight event structure to trigger Workers without continuous LLM polling.
+properties:
+  event_id:
+    type: string
+    description: Unique identifier for the event (UUID or SHA-based).
+  source:
+    type: string
+    enum: [github_webhook, filesystem_watcher, cron_trigger, worker_handoff, system_alert]
+    description: The origin emitting the event.
+  event_type:
+    type: string
+    enum: [issue_created, issue_updated, pr_opened, commit_pushed, schedule_tick, worker_ready]
+    description: Classification of the event.
+  priority:
+    type: string
+    enum: [LOW, MEDIUM, HIGH, CRITICAL]
+    default: MEDIUM
+    description: Execution urgency level.
+  target_worker:
+    type: string
+    description: Role or identifier of the intended Worker (e.g. Worker A, Harvester, QA_Controller).
+  event_evidence:
+    type: object
+    properties:
+      repository: string
+      resource_id: string
+      resource_url: string
+      payload_sha: string
+      timestamp: string
+    required: [repository, resource_id, timestamp]
+  constraints:
+    type: array
+    items:
+      type: string
+    description: Execution bounds for the receiving Worker.
+required:
+  - event_id
+  - source
+  - event_type
+  - priority
+  - target_worker
+  - event_evidence

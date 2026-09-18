@@ -1,0 +1,57 @@
+version: 1.0
+schema_name: cks_evidence_schema_v1
+purpose: Define structured evidence format documenting actions taken by Workers for auditability.
+properties:
+  evidence_id:
+    type: string
+    description: Unique identifier for the evidence record (UUID or SHA).
+  worker_id:
+    type: string
+    description: Identifier of the executing Worker.
+  action:
+    type: string
+    description: Precise description of the action performed.
+  inputs:
+    type: object
+    description: Input parameters, artifacts, or prompt references provided to the Worker.
+  output:
+    type: object
+    description: Primary results, deliverables, or status produced by the action.
+  affected_files:
+    type: array
+    items:
+      type: object
+      properties:
+        file_path: string
+        status:
+          type: string
+          enum: [NEW, MODIFY, DELETE]
+  changes_summary:
+    type: string
+    description: Human-readable narrative of changes made.
+  verifications:
+    type: array
+    items:
+      type: object
+      properties:
+        command: string
+        result:
+          type: string
+          enum: [PASS, FAIL, SKIPPED]
+        details: string
+  confidence_level:
+    type: string
+    enum: [HIGH, MEDIUM, LOW]
+    description: Self-assessed confidence level of verification.
+  constraints_notice:
+    type: string
+    default: Evidence record provides verification proof but does not override CKS Decision authority.
+required:
+  - evidence_id
+  - worker_id
+  - action
+  - output
+  - affected_files
+  - changes_summary
+  - verifications
+  - confidence_level
