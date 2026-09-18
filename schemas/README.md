@@ -49,6 +49,7 @@ LEGACY_KNOWLEDGE_OBJECT_CONTRACT = schemas/knowledge_object_v1.yaml
 | `cks-v1.4-metrics.schema.json` | COMPATIBILITY | Версионный v1.4 контракт метрик; не удалять без доказанного migration path (пути миграции). |
 | `cks_v1_6_event_model.yaml` | COMPATIBILITY | Версионная модель событий v1.6; события не меняют Canon автоматически. |
 | `cks_v1_7_graph_storage_model.yaml` | ACTIVE | Текущая описательная модель хранения производного графа; `authority=derived_index_only`. |
+| `cks_spy_worker_protocol_v1.yaml` | ACTIVE | Единый контракт протокола разведчика событий (Spy Worker) без постоянного запуска LLM. |
 | `context_package_kat9i_v1.yaml` | ACTIVE | Специализированный boundary-контракт для импорта из KAT9I_OS; не заменяет общий context package. |
 | `context_package_v1.yaml` | ACTIVE | Общий контракт context package. |
 | `decision_record_v1.yaml` | ACTIVE | Контракт decision record (записи решения). |

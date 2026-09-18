@@ -1,0 +1,46 @@
+version: 1.0
+schema_name: cks_spy_worker_protocol_v1
+purpose: Define light-weight event monitoring and change detection protocol for Spy Worker without continuous LLM invocation.
+properties:
+  protocol_version:
+    type: string
+    default: "1.0"
+  event_sources:
+    type: array
+    items:
+      type: object
+      properties:
+        source_name: string
+        source_type:
+          type: string
+          enum: [github_api_poller, git_repo_watcher, webhook_receiver, filesystem_monitor]
+        poll_interval_sec: integer
+  detection_rules:
+    type: array
+    items:
+      type: object
+      properties:
+        rule_id: string
+        trigger_pattern: string
+        target_entity: string
+        action_on_match: string
+  handoff_to_executor:
+    type: object
+    properties:
+      event_payload_schema: string
+      target_role: string
+      dispatch_method: string
+  spy_worker_constraints:
+    type: array
+    items:
+      type: string
+    default:
+      - Spy Worker MUST NOT execute code or modify knowledge objects.
+      - Spy Worker MUST NOT store canonical knowledge in CKS.
+      - Spy Worker MUST emit verified events only when match criteria pass.
+required:
+  - protocol_version
+  - event_sources
+  - detection_rules
+  - handoff_to_executor
+  - spy_worker_constraints
