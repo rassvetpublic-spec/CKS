@@ -44,6 +44,7 @@ LEGACY_KNOWLEDGE_OBJECT_CONTRACT = schemas/knowledge_object_v1.yaml
 | `cks-document-metadata.schema.json` | ACTIVE | JSON Schema метаданных; наличие и базовая сила схемы проверяются `schema_checks()` в `tools/cks_ci.py`. |
 | `cks-knowledge-object.schema.json` | ACTIVE | **Единственный контракт для нового универсального объекта знания**; исполняемо выбран `tools/cks_ci.py`. |
 | `cks-knowledge-view.schema.json` | ACTIVE | Контракт производного динамического представления; `authority=derived_view_only`, не SSOT. |
+| `cks-task-state.schema.json` | ACTIVE | Действующая JSON Schema объекта состояния задачи (CKS ASYNC HANDOFF v1.3). |
 | `cks-v1.4-knowledge-graph.schema.json` | COMPATIBILITY | Версионный v1.4 контракт формы графа; сохраняется отдельно от более нового storage model, автоматической замены не выполнять. |
 | `cks-v1.4-metrics.schema.json` | COMPATIBILITY | Версионный v1.4 контракт метрик; не удалять без доказанного migration path (пути миграции). |
 | `cks_v1_6_event_model.yaml` | COMPATIBILITY | Версионная модель событий v1.6; события не меняют Canon автоматически. |
