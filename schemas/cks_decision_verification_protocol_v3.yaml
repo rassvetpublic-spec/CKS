@@ -1,0 +1,36 @@
+version: 3.0
+schema_name: cks_decision_verification_protocol_v3
+purpose: Schema contract for automated verification and auditing of CKS decision records.
+properties:
+  protocol_version:
+    type: string
+    default: "3.0"
+  valid_decision_states:
+    type: array
+    items:
+      type: string
+      enum: [DRAFT, REVIEW, ACCEPTED, REJECTED, SUPERSEDED]
+  verification_gates:
+    type: array
+    items:
+      type: object
+      properties:
+        gate_id: string
+        gate_name: string
+        required: boolean
+        description: string
+  auditor_constraints:
+    type: array
+    items:
+      type: string
+    default:
+      - Auditor MUST NOT be the author of the decision proposal.
+      - Auditor MUST verify exact HEAD commit SHA and BASE SHA.
+      - Decision MUST contain verified evidence_refs before ACCEPTED status.
+      - Decision MUST document alternative options and rejection rationale.
+      - Physical storage MUST remain strictly within C:\GIT\.
+required:
+  - protocol_version
+  - valid_decision_states
+  - verification_gates
+  - auditor_constraints
