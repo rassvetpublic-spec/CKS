@@ -15,7 +15,7 @@ import subprocess
 import sys
 from dataclasses import dataclass, asdict
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Any
 
 try:
     from cks_json_schema_validator import validate_instance
@@ -239,13 +239,17 @@ def validate_knowledge_json(findings: list[Finding]) -> None:
         return
 
     schema_path = ROOT / "schemas" / "cks-knowledge-object.schema.json"
+    rel_schema = schema_path.relative_to(ROOT).as_posix()
     try:
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
-    except Exception:
-        return  # schema_checks reports the root cause
+    except Exception as exc:
+        findings.append(Finding("FAIL", "SCHEMA_LOAD_FAILED", rel_schema, str(exc)))
+        return
 
     canonical_count = 0
     for path in sorted(base.rglob("*.json")):
+        if "inbox" in path.parts:
+            continue
         rel = path.relative_to(ROOT).as_posix()
         canonical_count += 1
         try:
@@ -269,6 +273,8 @@ def validate_knowledge_json(findings: list[Finding]) -> None:
 
     yaml_paths = sorted(list(base.rglob("*.yaml")) + list(base.rglob("*.yml")))
     for path in yaml_paths:
+        if "inbox" in path.parts:
+            continue
         rel = path.relative_to(ROOT).as_posix()
         text = path.read_text(encoding="utf-8", errors="replace")
         top, duplicates = _yaml_top_level(text)
@@ -356,11 +362,28 @@ def select_files(findings: list[Finding]) -> list[str]:
     return []
 
 
-def write_reports(mode: str, findings: list[Finding], files: list[str]) -> dict[str, object]:
-    OUT.mkdir(parents=True, exist_ok=True)
+def write_reports(
+    artifacts_dir_or_mode: Any,
+    mode_or_findings: Any = None,
+    findings_or_files: Any = None,
+    files_or_none: Any = None,
+    changed_paths: list[str] | None = None,
+) -> dict[str, object]:
+    if isinstance(artifacts_dir_or_mode, (str, Path)) and str(artifacts_dir_or_mode) not in {"all", "traceability", "canon", "review-gate"}:
+        out_dir = Path(artifacts_dir_or_mode)
+        mode = str(mode_or_findings)
+        findings = findings_or_files if findings_or_files is not None else []
+        files = files_or_none if files_or_none is not None else (changed_paths or [])
+    else:
+        out_dir = OUT
+        mode = str(artifacts_dir_or_mode)
+        findings = mode_or_findings if mode_or_findings is not None else []
+        files = findings_or_files if findings_or_files is not None else []
+
+    out_dir.mkdir(parents=True, exist_ok=True)
     failures = sum(1 for f in findings if f.level == "FAIL")
     warnings = sum(1 for f in findings if f.level == "WARN")
-    result = {
+    result: dict[str, Any] = {
         "schema_version": "1.1",
         "mode": mode,
         "status": "FAIL" if failures else ("WARN" if warnings else "PASS"),
@@ -368,12 +391,43 @@ def write_reports(mode: str, findings: list[Finding], files: list[str]) -> dict[
         "changed_files": files,
         "findings": [asdict(f) for f in findings],
     }
-    (OUT / f"{mode}.json").write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    report_schema_path = ROOT / "schemas" / "cks-ci-report.schema.json"
+    if report_schema_path.exists():
+        try:
+            report_schema = json.loads(report_schema_path.read_text(encoding="utf-8"))
+            schema_errors = validate_instance(result, report_schema)
+            if schema_errors:
+                for err in schema_errors:
+                    findings.append(Finding(
+                        "FAIL",
+                        "CI_REPORT_SCHEMA_INVALID",
+                        report_schema_path.relative_to(ROOT).as_posix(),
+                        err,
+                    ))
+                failures = sum(1 for f in findings if f.level == "FAIL")
+                warnings = sum(1 for f in findings if f.level == "WARN")
+                result["status"] = "FAIL"
+                result["summary"] = {"fail": failures, "warn": warnings, "checked_changed_files": len(files)}
+                result["findings"] = [asdict(f) for f in findings]
+        except Exception as exc:
+            findings.append(Finding(
+                "FAIL",
+                "CI_REPORT_SCHEMA_LOAD_FAILED",
+                report_schema_path.relative_to(ROOT).as_posix(),
+                str(exc),
+            ))
+            failures = sum(1 for f in findings if f.level == "FAIL")
+            result["status"] = "FAIL"
+            result["summary"] = {"fail": failures, "warn": warnings, "checked_changed_files": len(files)}
+            result["findings"] = [asdict(f) for f in findings]
+
+    (out_dir / f"{mode}.json").write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     md = [
         f"# CKS CI Report — {mode}",
         "",
         f"Status: **{result['status']}**",
-        f"FAIL: {failures} | WARN: {warnings} | Changed files: {len(files)}",
+        f"FAIL: {result['summary']['fail']} | WARN: {result['summary']['warn']} | Changed files: {len(files)}",
         "",
         "## Findings",
     ]
@@ -382,7 +436,7 @@ def write_reports(mode: str, findings: list[Finding], files: list[str]) -> dict[
     else:
         for f in findings:
             md.append(f"- **{f.level}** `{f.code}` `{f.path}` — {f.message}")
-    (OUT / f"{mode}.md").write_text("\n".join(md) + "\n", encoding="utf-8")
+    (out_dir / f"{mode}.md").write_text("\n".join(md) + "\n", encoding="utf-8")
     return result
 
 
