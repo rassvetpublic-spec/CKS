@@ -36,6 +36,7 @@ LEGACY_KNOWLEDGE_OBJECT_CONTRACT = schemas/knowledge_object_v1.yaml
 |---|---|---|
 | `agent_report_v1.yaml` | ACTIVE | Контракт `agent_report`; отдельная сущность. |
 | `agent_task_v1.yaml` | ACTIVE | Контракт `agent_task`; отдельная сущность. |
+| `antigravity-event-v1.yaml` | ACTIVE | Контракт событий GUI Antigravity для интеграции с KAT9I_OS без мутации Canon CKS. |
 | `artifact_contract_v1.yaml` | ACTIVE | Контракт артефакта и его lifecycle-ограничений. |
 | `audit_report_v1.yaml` | ACTIVE | Контракт результата аудита. |
 | `candidate_object_v1.yaml` | ACTIVE | Контракт объекта-кандидата. |
@@ -48,6 +49,7 @@ LEGACY_KNOWLEDGE_OBJECT_CONTRACT = schemas/knowledge_object_v1.yaml
 | `cks-v1.4-metrics.schema.json` | COMPATIBILITY | Версионный v1.4 контракт метрик; не удалять без доказанного migration path (пути миграции). |
 | `cks_v1_6_event_model.yaml` | COMPATIBILITY | Версионная модель событий v1.6; события не меняют Canon автоматически. |
 | `cks_v1_7_graph_storage_model.yaml` | ACTIVE | Текущая описательная модель хранения производного графа; `authority=derived_index_only`. |
+| `cks_spy_worker_protocol_v1.yaml` | ACTIVE | Единый контракт протокола разведчика событий (Spy Worker) без постоянного запуска LLM. |
 | `context_package_kat9i_v1.yaml` | ACTIVE | Специализированный boundary-контракт для импорта из KAT9I_OS; не заменяет общий context package. |
 | `context_package_v1.yaml` | ACTIVE | Общий контракт context package. |
 | `cks_decision_verification_protocol_v3.yaml` | ACTIVE | Единый контракт протокола проверки решений (Decision Verification Protocol v3). |
