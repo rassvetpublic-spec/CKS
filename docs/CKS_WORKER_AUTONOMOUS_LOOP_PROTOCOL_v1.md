@@ -1,41 +1,41 @@
-# CKS WORKER AUTONOMOUS LOOP PROTOCOL v1
+# Протокол автономного цикла воркера CKS (CKS WORKER AUTONOMOUS LOOP PROTOCOL v1)
 
-## Purpose
+## Назначение (Purpose)
 
-Define the autonomous Worker cycle for GitHub-based task discovery, execution, and reporting.
+Определение автономного цикла `Worker` (воркера / исполнителя) для поиска задач, их выполнения и формирования отчётности на базе GitHub.
 
-## Repository
+## Репозиторий (Repository)
 
 REPOSITORY:
 https://github.com/rassvetpublic-spec/CKS
 
-## Loop
+## Автономный цикл (Loop)
 
-READ PROJECT
+READ PROJECT (чтение проекта)
 ↓
-SCAN ISSUES
+SCAN ISSUES (сканирование задач)
 ↓
-CLAIM TASK
+CLAIM TASK (взятие задачи)
 ↓
-EXECUTE
+EXECUTE (выполнение)
 ↓
-REPORT
+REPORT (отчётность)
 ↓
-CHECK CHANGES
+CHECK CHANGES (проверка изменений)
 ↓
-RESTART LOOP
+RESTART LOOP (перезапуск цикла)
 
-## Issue discovery
+## Поиск задач (Issue discovery)
 
-Worker searches open issues for tasks without an assigned executor.
+`Worker` проверяет открытые задачи `Issue` на наличие заданий без назначенного исполнителя.
 
-If a task exists and has no executor:
+Если задача существует и исполнитель не назначен:
 
-- claim the task;
-- record Worker identity;
-- start execution.
+- взять задачу в работу (`claim`);
+- зафиксировать идентификатор воркера (`Worker identity`);
+- начать выполнение (`execute`).
 
-## Claim format
+## Формат отметки о взятии (Claim format)
 
 CLAIMED:
 
@@ -48,24 +48,24 @@ Task:
 
 Started:
 
-## Channel rule
+## Правило канала связи (Channel rule)
 
-Every Worker task must define:
+Каждая задача воркера обязана объявлять:
 
 REPOSITORY:
 TARGET:
 CHANNEL:
 RETURN FORMAT:
 
-If CHANNEL is missing:
+Если `CHANNEL` (канал обратной связи) не указан:
 
-Worker must create a comment in the task stating that GitHub Issue conversation is used as the fallback feedback channel.
+`Worker` обязан оставить комментарий в задаче с указанием, что обсуждение задачи на GitHub (`GitHub Issue conversation`) используется в качестве резервного канала связи.
 
-## Reporting
+## Формирование отчёта (Reporting)
 
-If a report template exists, use it.
+Если существует шаблон отчёта (`report template`), использовать его.
 
-If no template exists:
+Если специализированного шаблона нет:
 
 STATUS:
 PASS / FAIL / BLOCKED
@@ -82,8 +82,8 @@ BLOCKERS:
 NEXT:
 -
 
-## Change detection
+## Отслеживание изменений (Change detection)
 
-After completing a task, Worker repeats issue inspection.
+После завершения задачи `Worker` повторяет сканирование `Issue`.
 
-New issue, task update, or relevant GitHub change restarts the loop from READ PROJECT.
+Появление новой задачи, обновление существующей задачи или релевантные изменения в GitHub перезапускают цикл с этапа `READ PROJECT` (чтение проекта).
