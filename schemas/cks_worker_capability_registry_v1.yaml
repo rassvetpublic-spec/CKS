@@ -1,0 +1,43 @@
+version: 1.0
+schema_name: cks_worker_capability_registry_v1
+purpose: Model-agnostic capability contract registry for Worker agent roles in CKS.
+properties:
+  registry_version:
+    type: string
+    default: "1.0"
+  worker_roles:
+    type: array
+    items:
+      type: object
+      properties:
+        role_name:
+          type: string
+          description: Standardized Worker role identifier (e.g. Implementation_Worker, Documentation_Architect, Harvester_Worker, QA_Controller).
+        capability_contract:
+          type: object
+          properties:
+            task_types:
+              type: array
+              items:
+                type: string
+              description: Supported task categories (e.g. code_refactor, schema_design, evidence_collection, protocol_audit).
+            input_requirements:
+              type: array
+              items:
+                type: string
+              description: Mandatory input specifications required to trigger this role.
+            expected_output:
+              type: array
+              items:
+                type: string
+              description: Deliverables and evidence artifacts emitted by this role.
+            constraints:
+              type: array
+              items:
+                type: string
+              description: Hard execution boundaries for this role.
+          required: [task_types, input_requirements, expected_output, constraints]
+      required: [role_name, capability_contract]
+required:
+  - registry_version
+  - worker_roles
