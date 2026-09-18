@@ -1,67 +1,67 @@
-# CKS Harvester Worker Protocol v1
+# Протокол воркера-сборщика знаний CKS v1 (CKS Harvester Worker Protocol v1)
 
-## Purpose
+## Назначение (Purpose)
 
-Harvester Worker is a knowledge discovery worker.
+Воркер-сборщик знаний (`Harvester Worker`) отвечает за обнаружение, извлечение и структурирование скрытого знания.
 
-It does not replace Executor, QA, Review or Governance roles.
+Он не заменяет роли Исполнителя (`Executor`), Тестировщика (`QA`), Архитектурного ревьюера (`Review`) или Управления (`Governance`).
 
-Mission:
-- find hidden knowledge;
-- recover lost ideas;
-- connect existing evidence;
-- create knowledge objects for review.
+Миссия сборщика:
+- выявление скрытых знаний;
+- восстановление утерянных идей и контекста;
+- связывание существующих доказательств (`Evidence`);
+- формирование объектов знаний (`Knowledge Objects`) для последующего ревью.
 
-## Boundary
+## Границы ответственности (Boundary)
 
-CKS stores:
-- intent;
-- context;
-- evidence;
-- decisions;
-- history.
+CKS хранит:
+- намерения и цели (`Intent`);
+- контекст (`Context`);
+- доказательства (`Evidence`);
+- решения (`Decisions`);
+- историю изменений (`History`).
 
-KAT9I_OS stores:
-- execution;
-- agents;
-- tools;
-- workflows;
-- runtime.
+KAT9I_OS отвечает за:
+- исполнение (`Execution`);
+- тела агентов (`Agents`);
+- инструменты (`Tools`);
+- рабочие процессы (`Workflows`);
+- среду выполнения (`Runtime`).
 
-Harvester must not create execution dependencies inside CKS.
+Сборщик (`Harvester`) не должен создавать исполнительных зависимостей внутри CKS.
 
-## Worker Roles
+## Роли воркеров (Worker Roles)
 
 ```text
-Executor
-- changes system
+Executor (Исполнитель)
+- вносит изменения в систему
 
-QA
-- verifies quality
+QA (Контроллер качества)
+- проверяет техническое качество и тесты
 
-Review
-- verifies meaning and architecture
+Review (Архитектурный ревьюер)
+- проверяет смысл, границы и архитектуру
 
-Harvester
-- discovers and structures knowledge
+Harvester (Сборщик знаний)
+- обнаруживает и структурирует знания
 
-Controller
-- coordinates flow
+Controller (Координатор)
+- координирует общий поток задач
 ```
 
-## Sources
+## Источники знаний (Sources)
 
-Harvester may inspect:
+Сборщик может анализировать:
 
-- open and closed Issues;
-- pull requests;
-- comments;
-- rejected ideas;
-- research notes;
-- historical documents;
-- worker reports.
+- открытые и закрытые задачи `Issue`;
+- pull-реквесты (`PR`);
+- комментарии к обсуждениям;
+- отвергнутые идеи и кладбище гипотез (`Graveyard`);
+- исследовательские заметки (`Research Notes`);
+- исторические документы;
+- отчёты воркеров (`Worker Reports`).
 
-## Knowledge Objects
+## Объекты знаний (Knowledge Objects)
 
 ```yaml
 knowledge_object:
@@ -74,11 +74,11 @@ knowledge_object:
   evidence: []
 ```
 
-## Clusters
+## Кластеры знаний (Clusters)
 
-Clusters group related knowledge objects.
+Кластеры объединяют тематически связанные объекты знаний.
 
-Example:
+Пример:
 
 ```yaml
 cluster:
@@ -91,9 +91,9 @@ cluster:
     - Validation Gate
 ```
 
-## Tags
+## Теги и категории (Tags)
 
-Required tag dimensions:
+Обязательные измерения классификации:
 
 ```yaml
 tags:
@@ -118,22 +118,22 @@ tags:
     - archived
 ```
 
-## Rules
+## Правила работы (Rules)
 
-Harvester:
+Сборщик (`Harvester`):
 
-- may discover;
-- may classify;
-- may link;
-- may propose.
+- может обнаруживать (`discover`);
+- может классифицировать (`classify`);
+- может связывать (`link`);
+- может предлагать (`propose`).
 
-Harvester cannot:
+Сборщику запрещено:
 
-- promote findings directly to Canon;
-- approve own discoveries;
-- merge changes without validation.
+- напрямую повышать найденные элементы до Канона (`Canon`);
+- самостоятельно утверждать собственные находки;
+- выполнять слияние изменений без прохождения валидационных гейтов.
 
-## Report Format
+## Формат отчёта сборщика (Report Format)
 
 ```yaml
 harvester_report:
@@ -146,32 +146,16 @@ harvester_report:
   review_required: true
 ```
 
-## Metrics
+## Метрики эффективности (Metrics)
 
-```text
-Discovery Coverage
-████████░░
+- Покрытие поиска (`Discovery Coverage`)
+- Связывание знаний (`Knowledge Linking`)
+- Обнаружение дубликатов (`Duplicate Detection`)
+- Качество доказательств (`Evidence Quality`)
 
-Knowledge Linking
-██████░░░░
+## Совместимость (Compatibility)
 
-Duplicate Detection
-████░░░░░░
-
-Evidence Quality
-████████░░
-```
-
-## Compatibility
-
-CKS Contract:
-v1
-
-KAT9I_OS compatibility:
-YES
-
-Execution layer:
-EXTERNAL
-
-Model routing:
-OPTIONAL FUTURE
+- Контракт CKS: `v1`
+- Совместимость с KAT9I_OS: `YES`
+- Исполнительный слой: `EXTERNAL` (внешний)
+- Маршрутизация моделей: `OPTIONAL FUTURE` (опционально в v2)
