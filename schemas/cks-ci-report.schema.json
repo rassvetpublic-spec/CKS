@@ -1,10 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "CKS CI Report",
+  "title": "CKS CI Report v1.1",
+  "description": "Схема отчёта CKS CI версии 1.1",
   "type": "object",
   "required": ["schema_version", "mode", "status", "summary", "changed_files", "findings"],
   "properties": {
-    "schema_version": {"const": "1.0"},
+    "schema_version": {
+      "const": "1.1",
+      "enum": ["1.1"]
+    },
     "mode": {"enum": ["all", "traceability", "canon", "review-gate"]},
     "status": {"enum": ["PASS", "WARN", "FAIL"]},
     "summary": {
