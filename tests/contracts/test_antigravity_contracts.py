@@ -12,7 +12,7 @@ def test_required_architecture_documents_exist():
         "ADR-001-ANTIGRAVITY-GUI-CONTRACTS.md",
         "ANTIGRAVITY-EVENT-CONTRACT-v1.md",
         "ANTIGRAVITY-EVIDENCE-ADAPTER-v1.md",
-        "ANTIGRAVITY-QA_CONTEXT-BRIDGE-v1.md",
+        "ANTIGRAVITY-QA-CONTEXT-BRIDGE-v1.md",
     ]
     for item in required:
         assert (DOCS / item).exists()
