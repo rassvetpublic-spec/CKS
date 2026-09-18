@@ -1,67 +1,67 @@
-# CKS ASYNC HANDOFF PROTOCOL v1.3
+# Протокол асинхронной передачи состояния CKS (CKS ASYNC HANDOFF PROTOCOL v1.3)
 
-## Purpose
+## Назначение (Purpose)
 
-Protocol for asynchronous transfer of state between Worker, QA, and Review Controller, connecting the protocol to real asynchronous execution workflows.
+Протокол асинхронной передачи состояния между `Worker` (исполнителем), `QA Controller` (контроллером качества) и `Review Controller` (контроллером архитектурного ревью), связывающий формальный протокол с реальными процессами асинхронного исполнения.
 
-## Target Model & Lifecycle
+## Целевая модель и жизненный цикл (Target Model & Lifecycle)
 
-The task execution lifecycle is tracked via a single authoritative Task State Object:
+Жизненный цикл исполнения задачи отслеживается через единый авторитетный объект состояния задачи — `Task State Object`:
 
 ```text
 READY → IN_PROGRESS → HANDOFF → QA → REVIEW → VERDICT → MERGED
 ```
 
 ```text
-TASK
+TASK (задача)
   ↓
-OWNER (Worker A/B)
+OWNER (владелец / Worker A/B)
   ↓
-HANDOFF
+HANDOFF (передача состояния)
   ↓
-QA+REVIEW CONTROLLER
+QA+REVIEW CONTROLLER (контроллеры проверки и ревью)
   ↓
-VERDICT
+VERDICT (вердикт решения)
   ↓
-HISTORY
+HISTORY (история репозитория)
 ```
 
-### Lifecycle States
+### Состояния жизненного цикла (Lifecycle States)
 
-1. **READY**: Task is specified, prerequisites identified, unassigned or awaiting execution start.
-2. **IN_PROGRESS**: Claimed by Owner (Worker A / Worker B), active implementation on a dedicated branch.
-3. **HANDOFF**: Owner completes changes, pushes branch, creates PR, and emits HANDOFF with exact SHA, BASE_SHA, and evidence links.
-4. **QA**: Independent verification against exact SHA and tests/CI gates.
-5. **REVIEW**: Architecture and contract review against SSOT and canon boundaries.
-6. **VERDICT**: Decision recorded by Review Controller referencing exact SHA (`APPROVED` | `REQUEST_CHANGES` | `BLOCKED`).
-7. **MERGED**: Task completed, PR merged into target branch, state recorded in history.
+1. **READY**: Задача специфицирована, предварительные требования определены, задача готова к взятию в работу.
+2. **IN_PROGRESS**: Взята исполнителем (`Owner` / Worker A или Worker B), активная реализация в выделенной ветке.
+3. **HANDOFF**: Исполнитель завершил изменения, запушил ветку, создал PR и опубликовал отчет `HANDOFF` с указанием точных `SHA`, `BASE_SHA` и ссылок на доказательства (`Evidence`).
+4. **QA**: Независимая проверка контроллером качества на точном зафиксированном коммите `SHA` по тестам и статус-проверкам CI.
+5. **REVIEW**: Архитектурная проверка соответствия контрактам, границам `Canon` и источнику истины `SSOT`.
+6. **VERDICT**: Решение, зафиксированное контроллером ревью со ссылкой на точный `SHA` (`APPROVED` | `REQUEST_CHANGES` | `BLOCKED`).
+7. **MERGED**: Задача выполнена, PR слит в целевую ветку, факт зафиксирован в истории репозитория.
 
-## Roles and Separation
+## Роли и разделение полномочий (Roles and Separation)
 
-Strict separation of roles is enforced to prevent role ambiguity:
+Для исключения двусмысленности полномочий соблюдается строгое разделение ролей:
 
-- **OWNER (Worker A / Worker B)**: Implements changes, owns the execution lane, creates branch/PR, and emits HANDOFF. Does NOT issue self-verdicts or perform self-merging.
-- **CHECKER (QA Controller)**: Validates tests, verifies evidence artifacts, and confirms exact SHA matches.
-- **DECIDER (Review Controller / Repo Admin)**: Validates SSOT consistency, compliance with canon invariants, issues VERDICT, and approves merge.
+- **OWNER (Worker A / Worker B)**: Реализует изменения, владеет рабочей веткой, создает ветку/PR и формирует `HANDOFF`. Не выносит вердикты по собственной работе и не выполняет самослияние (self-merge).
+- **CHECKER (QA Controller)**: Проверяет прохождение тестов, валидирует артефакты доказательств (`Evidence`) и подтверждает соответствие точного коммита `SHA`.
+- **DECIDER (Review Controller / Repo Admin)**: Проверяет согласованность с `SSOT`, соблюдение инвариантов `Canon`, выносит официальный `VERDICT` и одобряет слияние (`MERGE`).
 
-No single agent or participant may combine conflicting roles for the same change boundary.
+Ни один отдельный агент или участник не может совмещать конфликтующие роли для одной и той же границы изменений.
 
-## Rules
+## Правила (Rules)
 
-- **Single Task State Tracking**: One task can be tracked from assignment to merge via its Task State Object (`schemas/cks-task-state.schema.json` and `templates/TASK_TEMPLATE.md`).
-- **Exact Verification Boundary**: `SHA` + `BASE_SHA` define the immutable boundary of verified state.
-- **HANDOFF vs Commits**: HANDOFF represents state transfer, not EVIDENCE. Keep HANDOFF separate from code commits. Do NOT create commits solely for state exchange.
-- **VERDICT Integrity**: A VERDICT is valid only for the exact SHA referenced. Any new commit/SHA invalidates the previous verdict and resets the review gate.
-- **Declared Return Channel**: Every TASK and HANDOFF must declare its repository and return channel (default: GitHub PR conversation). All worker feedback and review verdicts must return through the declared channel.
+- **Отслеживание единого состояния задачи (Single Task State Tracking)**: Задача отслеживается от назначения до слияния через объект состояния задачи (`schemas/cks-task-state.schema.json` и `templates/TASK_TEMPLATE.md`).
+- **Точная граница верификации (Exact Verification Boundary)**: Хэши коммитов `SHA` + `BASE_SHA` определяют неизменяемую границу проверяемого состояния.
+- **Разделение HANDOFF и коммитов (HANDOFF vs Commits)**: `HANDOFF` — это передача состояния, а не доказательство (`Evidence`). Запрещено создавать коммиты исключительно ради передачи служебного статуса.
+- **Неизменность вердикта (VERDICT Integrity)**: Вердикт `VERDICT` действителен только для указанного точного коммита `SHA`. Любой новый коммит или изменение `SHA` аннулирует предыдущий вердикт и перезапускает гейт проверки.
+- **Обязательный канал возврата (Declared Return Channel)**: Каждая задача `TASK` и передача `HANDOFF` обязаны объявлять репозиторий и канал возврата (по умолчанию: GitHub PR conversation). Вся обратная связь и вердикты возвращаются строго через объявленный канал.
 
-## Model Summary
+## Сводная модель (Model Summary)
 
 ```text
-PR         = work object
-TASK STATE = lifecycle object (`schemas/cks-task-state.schema.json`, `templates/TASK_TEMPLATE.md`)
-HANDOFF    = state transfer
-EVIDENCE   = verifiable proof (CI runs, test logs, artifact SHAs)
-VERDICT    = authoritative decision
-CHANNEL    = return path for execution feedback
-HISTORY    = recorded repository knowledge
+PR         = рабочий объект (work object)
+TASK STATE = объект жизненного цикла (`schemas/cks-task-state.schema.json`, `templates/TASK_TEMPLATE.md`)
+HANDOFF    = передача состояния (state transfer)
+EVIDENCE   = проверяемые доказательства (прогоны CI, логи тестов, SHA артефактов)
+VERDICT    = авторитетное решение (authoritative decision)
+CHANNEL    = канал обратной связи (return path for execution feedback)
+HISTORY    = зафиксированная история знаний (recorded repository knowledge)
 ```
