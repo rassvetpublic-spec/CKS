@@ -52,6 +52,7 @@ LEGACY_KNOWLEDGE_OBJECT_CONTRACT = schemas/knowledge_object_v1.yaml
 | `cks_spy_worker_protocol_v1.yaml` | ACTIVE | Единый контракт протокола разведчика событий (Spy Worker) без постоянного запуска LLM. |
 | `context_package_kat9i_v1.yaml` | ACTIVE | Специализированный boundary-контракт для импорта из KAT9I_OS; не заменяет общий context package. |
 | `context_package_v1.yaml` | ACTIVE | Общий контракт context package. |
+| `cks_decision_verification_protocol_v3.yaml` | ACTIVE | Единый контракт протокола проверки решений (Decision Verification Protocol v3). |
 | `decision_record_v1.yaml` | ACTIVE | Контракт decision record (записи решения). |
 | `decision_reference_v1.yaml` | ACTIVE | Отдельный контракт ссылки на решение. |
 | `distillate_object_v1.yaml` | ACTIVE | Контракт Distillate Worker → KAT9I_OS; `tools/cks_ci.py` имеет отдельную проверку `distillate_object`. |
