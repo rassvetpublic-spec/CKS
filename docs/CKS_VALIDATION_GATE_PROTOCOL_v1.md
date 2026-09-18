@@ -1,95 +1,100 @@
-# CKS Validation Gate Protocol v1
+# Протокол гейта валидации CKS v1 (CKS Validation Gate Protocol v1)
 
-## Назначение
+## Назначение (Purpose)
 
-Определяет независимую проверку изменений перед merge.
+Определяет независимую проверку изменений перед слиянием (`Merge`).
 
-Поток:
+Поток валидации:
 
-Worker
-→ PR
-→ QA Request
-→ QA
-→ Review Request
-→ Review
-→ Merge Ready
-→ Merge
+```text
+Worker (исполнитель)
+→ PR (рабочий объект)
+→ QA Request (запрос тестирования)
+→ QA (независимая верификация)
+→ Review Request (запрос ревью)
+→ Review (архитектурный аудит)
+→ Merge Ready (готовность к слиянию)
+→ Merge (слияние)
+```
 
-## Роли
+## Роли и ответственность (Roles and Responsibilities)
 
-### Worker
+### Воркер (Worker / Исполнитель)
 
 Ответственность:
 - выполнить задачу;
 - создать PR;
-- подготовить evidence;
-- запросить QA и Review.
+- подготовить проверяемые доказательства (`Evidence`);
+- запросить проведение QA и архитектурного ревью (`Review`).
 
 Запрещено:
-- QA собственного PR;
-- Review собственного PR;
-- подтверждение собственного merge.
+- проведение QA собственного PR;
+- проведение Review собственного PR;
+- подтверждение собственного слияния (`Self-Merge`).
 
-### QA
-
-Проверяет:
-- тесты;
-- CI;
-- регрессии;
-- соответствие требованиям.
-
-Результат:
-- PASS;
-- FAIL;
-- BLOCKED.
-
-### Review
+### Контроллер качества (QA Controller)
 
 Проверяет:
-- архитектуру;
-- границы CKS;
-- Canon;
-- governance;
-- соответствие принципам проекта.
+- модульные и интеграционные тесты;
+- статус рабочих процессов CI;
+- отсутствие регрессий;
+- соответствие критериям приёмки задачи.
 
-Результат:
-- APPROVED;
-- REQUEST CHANGES;
-- BLOCKED.
+Результат проверки:
+- `PASS` (пройдено);
+- `FAIL` (ошибка);
+- `BLOCKED` (заблокировано).
 
-## Независимость
+### Архитектурный ревьюер (Review Controller)
 
+Проверяет:
+- архитектурную целостность;
+- границы ответственности CKS и KAT9I_OS;
+- неизменность инвариантов канона (`Canon`);
+- правила управления репозиторием (`Governance`);
+- соответствие принципам проекта CKS.
+
+Результат ревью:
+- `APPROVED` (одобрено);
+- `REQUEST_CHANGES` (требуются изменения);
+- `BLOCKED` (заблокировано).
+
+## Принцип независимости (Independence Invariant)
+
+```text
 Author PR != QA
 Author PR != Review
+```
 
-QA и Review не могут выполняться автором изменения.
+Проверки QA и архитектурное ревью не могут выполняться автором изменения.
 
-## Handoff поля
+## Поля передачи состояния (HANDOFF Fields)
 
+```yaml
 QA:
-- REQUIRED
-- REQUESTED
-- ASSIGNEE
-- RESULT
+  REQUIRED: true
+  REQUESTED: true
+  ASSIGNEE: [логин / роль]
+  RESULT: PASS | FAIL | BLOCKED
 
 REVIEW:
-- REQUIRED
-- REQUESTED
-- ASSIGNEE
-- RESULT
+  REQUIRED: true
+  REQUESTED: true
+  ASSIGNEE: [логин / роль]
+  RESULT: APPROVED | REQUEST_CHANGES | BLOCKED
 
-CHANNEL:
-GitHub PR conversation
+CHANNEL: GitHub PR conversation
+```
 
-## Merge Gate
+## Условия допуска к слиянию (Merge Gate)
 
-Merge разрешён только если:
+Слияние ветки (`Merge`) разрешено строго при выполнении условий:
 
-QA = PASS
-REVIEW = APPROVED
-Evidence = PRESENT
-Blockers = NONE
+- `QA = PASS`
+- `REVIEW = APPROVED`
+- `Evidence = PRESENT`
+- `Blockers = NONE`
 
-## Future
+## Будущее развитие (Future Extensions)
 
-Автоматический Merge Controller может быть добавлен позже.
+Автоматический контроллер слияния (`Merge Controller`) может быть добавлен в последующих версиях протокола.
