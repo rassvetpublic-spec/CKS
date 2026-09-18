@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Dependency-free JSON Schema subset validator used by CKS CI.
 
-Supports the keywords currently used by CKS schemas: type, required,
+Supports the keywords currently used by CKS schemas: type, const, required,
 properties, enum, pattern, items, oneOf, uniqueItems, minimum, maximum and
 additionalProperties=false.
 """
@@ -53,6 +53,9 @@ def validate_instance(value: Any, schema: dict[str, Any], path: str = "$") -> li
         if not any(_type_matches(value, item) for item in expected_types):
             errors.append(f"{path}: expected type {expected_types}, got {type(value).__name__}")
             return errors
+
+    if "const" in schema and (value != schema["const"] or (isinstance(value, bool) != isinstance(schema["const"], bool))):
+        errors.append(f"{path}: value {value!r} does not match const {schema['const']!r}")
 
     if "enum" in schema and value not in schema["enum"]:
         errors.append(f"{path}: value {value!r} is not in enum")
