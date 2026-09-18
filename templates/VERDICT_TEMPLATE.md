@@ -6,6 +6,11 @@ CKS_ASYNC_HANDOFF
 VERSION:
 1.2
 
+REPOSITORY:
+
+RESULT_CHANNEL:
+GitHub PR conversation
+
 PR:
 
 SHA:
