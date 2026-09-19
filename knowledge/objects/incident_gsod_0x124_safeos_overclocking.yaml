@@ -1,0 +1,19 @@
+id: incident_gsod_0x124_safeos_overclocking
+type: incident_report
+status: resolved
+classification: FACT
+date: "2026-09-19"
+title: "Windows Update SafeOS GSOD 0x124 (WHEA) dual-remediation"
+symptoms:
+  - "Windows 11 Insider Update fails with 0xc1900101"
+  - "GSOD with DPC_WATCHDOG_VIOLATION (0x133) visually observed"
+  - "Setup logs show Access Denied (0x00000005) for Kaspersky registry migration"
+root_causes:
+  - "Hardware: i9-9900K instability (Silicon Degradation / Enhanced Multi-Core Performance) triggered Machine Check Exception (0x124 Parameter 1=0) under heavy SafeOS load."
+  - "Software: Kaspersky self-defense blocked SafeOS registry migration."
+remediation:
+  - "Hardware: Disabled Enhanced Multi-Core Performance and XMP in Gigabyte BIOS, set VCore to Auto."
+  - "Software: Temporarily disabled Kaspersky protection before final reboot."
+  - "Diagnostic: Enabled CrashDumpEnabled=7 and AlwaysKeepMemoryDump=1 to accurately capture the 0x124 bugcheck instead of 0x133."
+evidence_links:
+  - "../reports/Update_Failure_Root_Cause.md"
