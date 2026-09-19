@@ -1,0 +1,24 @@
+version: '0.1.0'
+mode: github_artifact_review
+core_policy: frozen
+runtime_owner: external
+runtime_state: '${CKS_BRIDGE_HOME}/state'
+workflow:
+  max_review_cycles: 3
+  stages: [PROPOSAL, REVIEW, REVISION, VALIDATION, DECISION, CLOSED]
+  human_gate_required: true
+  automatic_promotion: false
+  automatic_execution: false
+artifacts:
+  proposals: council/proposals
+  reviews: council/reviews
+  decisions: council/decisions
+  canonical_decisions: decisions
+contracts:
+  task: schemas/agent_task_v1.yaml
+  report: schemas/agent_report_v1.yaml
+  decision: schemas/decision_record_v1.yaml
+  review: protocols/review_protocol.md
+metrics:
+  storage: external
+  fields: [cycles_count, review_failures, decision_time, token_cost, rejected_patterns]

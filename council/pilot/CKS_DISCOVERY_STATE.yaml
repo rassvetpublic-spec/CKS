@@ -1,0 +1,35 @@
+version: 1.2-discovery
+status: active
+
+core:
+  frozen: true
+  changes: 0
+
+cks_1_1:
+  status: review_pending
+  council_v01:
+    human_gate: open
+  merge:
+    automatic: false
+
+cks_1_2:
+  status: discovery
+  canon: false
+  stable: false
+
+artifacts:
+  blueprint: true
+  proposal: true
+  schemas: true
+  lifecycle_tests: true
+  validation_matrix: true
+  human_gate_packet: true
+
+known_gaps:
+  - rejected_history_lifecycle
+
+rules:
+  chat_pass_is_not_approval: true
+  discovery_is_not_canon: true
+  runtime_is_not_knowledge: true
+  owner_is_not_knowledge_field: true

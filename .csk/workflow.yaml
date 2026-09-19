@@ -1,0 +1,16 @@
+version: '0.1.0'
+# Декларативный контракт для внешнего исполнителя; Actions его не исполняет.
+transitions:
+  - {from: PROPOSAL, event: submit, to: REVIEW}
+  - {from: REVIEW, event: PASS, to: VALIDATION}
+  - {from: REVIEW, event: NEEDS_REVISION, to: REVISION, before_cycle_limit: true}
+  - {from: REVIEW, event: FAIL, to: REVISION, before_cycle_limit: true}
+  - {from: REVIEW, event: cycle_limit, to: DECISION}
+  - {from: REVISION, event: submit, to: REVIEW, invalidate_previous_review: true}
+  - {from: VALIDATION, event: PASS, to: DECISION}
+  - {from: VALIDATION, event: FAIL, to: REVISION, before_cycle_limit: true}
+  - {from: VALIDATION, event: cycle_limit, to: DECISION}
+  - {from: DECISION, event: APPROVE, to: CLOSED, require_current_pass: true, require_evidence: true, require_human: true}
+  - {from: DECISION, event: REJECT, to: CLOSED, require_human: true}
+  - {from: DECISION, event: REQUEST_CHANGE, to: REVISION, require_human: true, before_cycle_limit: true}
+cycle_limit_policy: reject_or_new_linked_proposal

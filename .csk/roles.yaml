@@ -1,0 +1,19 @@
+version: '0.1.0'
+roles:
+  architect:
+    enabled: true
+    prompt: council/roles/architect.md
+    outputs: [proposal, revision]
+    can_approve: false
+  reviewer:
+    enabled: true
+    prompt: council/roles/reviewer.md
+    outputs: [review, evidence_refs]
+    can_approve: false
+    worker_binding: null
+  human_gate:
+    required: true
+    prompt: council/roles/owner.md
+    commands: [APPROVE, REJECT, REQUEST_CHANGE]
+    authorized_github_logins: []
+    empty_allowlist: deny

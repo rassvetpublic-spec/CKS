@@ -1,0 +1,38 @@
+name: Council — проверка
+description: Проверка конкретной ревизии предложения Council.
+title: '[COUNCIL REVIEW] '
+body:
+  - type: input
+    id: proposal_issue
+    attributes:
+      label: Ссылка на исходный Issue
+    validations:
+      required: true
+  - type: textarea
+    id: revision
+    attributes:
+      label: Проверенная ревизия
+      description: Укажите proposal_ref, proposal_revision, PR_HEAD, BASE_REFERENCE и номер цикла (1–3).
+    validations:
+      required: true
+  - type: dropdown
+    id: verdict
+    attributes:
+      label: Результат
+      options: [PASS, FAIL, NEEDS_REVISION]
+    validations:
+      required: true
+  - type: textarea
+    id: findings
+    attributes:
+      label: Замечания и доказательства
+      description: 'Для каждого замечания: важность, место, причина, исправление. Если замечаний нет, укажите выполненные проверки и ссылки на результаты.'
+    validations:
+      required: true
+  - type: input
+    id: artifact
+    attributes:
+      label: Ссылка на артефакт Review
+      description: 'council/reviews/CKS-XXXX-review-rN.md в конкретном коммите.'
+    validations:
+      required: true

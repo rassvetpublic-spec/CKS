@@ -1,0 +1,27 @@
+version: '0.1.0'
+qa_worker:
+  enabled: false
+  repository: null
+  workflow: null
+  context_required: [PR_HEAD, BASE_REFERENCE, CURRENT_DECISION_STATE, proposal_ref, proposal_revision, knowledge_refs]
+  result_required: [agent, task, artifacts, status, evidence, reviewed_head, proposal_revision]
+  result_mapping: {PASS: PASS, FAIL: REJECT, NEEDS_REVISION: NEEDS_REVIEW}
+  freshness: exact_head_and_proposal_revision
+  raw_chat_allowed: false
+project_lifecycle:
+  enabled: false
+  project_id: null
+  status_field_id: null
+  status_option_ids: {}
+  source: config/project_states.yaml
+  council_mapping:
+    PROPOSAL: ANALYSIS
+    REVIEW: DESIGN
+    REVISION: DESIGN
+    VALIDATION: DESIGN
+    DECISION: DESIGN
+  approved_next: IMPLEMENTATION
+  rejected_next: GRAVEYARD_REVIEW
+  execution_sequence: [IMPLEMENTATION, QA, ACCEPTED, COMPLETED]
+  acceptance_requires: [implementation_artifact, current_qa_pass, evidence_refs]
+  closure_promotes_knowledge: false

@@ -1,0 +1,21 @@
+schema_version: v1
+status: discovery-draft
+
+object:
+  type: experience_record
+  fields:
+    id: required
+    experiment: required
+    context: required
+    action_taken: required
+    outcome: required
+    lesson_learned: required
+    evidence:
+      required: true
+    provenance:
+      required: true
+
+constraints:
+  - experience_is_not_canon_knowledge
+  - no_runtime_state
+  - no_execution_ownership

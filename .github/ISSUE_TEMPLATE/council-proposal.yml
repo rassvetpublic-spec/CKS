@@ -1,0 +1,47 @@
+name: Council — предложение
+description: Предложение решения с основаниями и границами изменения.
+title: '[COUNCIL] '
+body:
+  - type: markdown
+    attributes:
+      value: 'Council v0.1: предложение → проверка → решение владельца. CORE остаётся замороженным. Полные беседы не прикладывать.'
+  - type: textarea
+    id: problem
+    attributes:
+      label: Проблема и ожидаемый результат
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Контекст и ссылки на знания
+      description: Укажите актуальные документы и ограничения CKS.
+    validations:
+      required: true
+  - type: textarea
+    id: options
+    attributes:
+      label: Варианты и выбранное решение
+      description: Обоснуйте выбор, риски и способ отката.
+    validations:
+      required: true
+  - type: input
+    id: proposal
+    attributes:
+      label: Ссылка на Proposal и его ревизию
+      description: 'council/proposals/CKS-XXXX.md в конкретном коммите.'
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Доказательства и критерии проверки
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Граница CKS
+      options:
+        - label: Изменение не расширяет CORE и не переносит исполнение или память агентов в CKS.
+          required: true
