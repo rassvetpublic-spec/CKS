@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cks.rassvetpublic.com/schemas/cks-task-state.schema.json",
+  "type": "object",
+  "title": "CKS Task State Object",
+  "description": "State tracking object for CKS ASYNC HANDOFF v1.3",
+  "required": ["task_id", "status", "owner", "sha", "channel"],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "description": "Unique identifier for the task"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["READY", "IN_PROGRESS", "HANDOFF", "QA", "REVIEW", "VERDICT", "MERGED"],
+      "description": "Current lifecycle state of the task"
+    },
+    "owner": {
+      "type": "string",
+      "description": "Worker assigned as the OWNER of the task"
+    },
+    "controller": {
+      "type": "string",
+      "description": "QA+REVIEW CONTROLLER assigned to the task"
+    },
+    "sha": {
+      "type": "string",
+      "description": "The exact SHA representing the verification boundary"
+    },
+    "base_sha": {
+      "type": "string",
+      "description": "The base SHA for comparison"
+    },
+    "channel": {
+      "type": "string",
+      "description": "Return channel for execution feedback (e.g. GitHub PR or Issue URL)"
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of evidence artifacts or references"
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["PENDING", "PASS", "FAIL", "REJECTED"],
+      "description": "Final decision emitted by the Controller"
+    }
+  }
+}
