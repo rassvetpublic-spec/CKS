@@ -1,0 +1,74 @@
+{
+  "id": "CKS-INC-001",
+  "legacy_id": "incident_gsod_0x124_safeos_overclocking",
+  "type": "observation",
+  "status": "validated",
+  "owner": "rassvetpublic-spec/CKS",
+  "lifecycle": "knowledge",
+  "version": 2,
+  "date": "2026-09-19",
+  "title": "Windows Update SafeOS: GSOD 0x124 (WHEA) и двойная ремедиация",
+  "classification": "FACT",
+  "clusters": [
+    "windows-update",
+    "incident-analysis"
+  ],
+  "tags": [
+    "gsod",
+    "whea",
+    "safeos",
+    "0xc1900101",
+    "kaspersky",
+    "cpu-stability"
+  ],
+  "projects": [
+    "CKS"
+  ],
+  "relations": [],
+  "evidence": [
+    "../reports/Update_Failure_Root_Cause.md"
+  ],
+  "history": [
+    {
+      "version": 1,
+      "status": "captured",
+      "timestamp": "2026-09-19",
+      "reason": "Первичная фиксация инцидента Antigravity.",
+      "changed_by": "KAT9I_OS / Antigravity"
+    },
+    {
+      "version": 2,
+      "status": "validated",
+      "timestamp": "2026-09-19",
+      "reason": "Приведение к CKS Knowledge Object Model v4 и разделение подтверждённых фактов от гипотезы о деградации кремния.",
+      "changed_by": "ChatGPT QA"
+    }
+  ],
+  "symptoms": [
+    "Windows 11 Insider Update откатывался с ошибкой 0xC1900101.",
+    "Во время обновления визуально наблюдался GSOD DPC_WATCHDOG_VIOLATION (0x133).",
+    "Журналы установки содержали Access Denied (0x00000005) при миграции компонентов Kaspersky."
+  ],
+  "evidence_facts": [
+    "setupact.log после инструментированного повтора зафиксировал Bugcheck code 0x00000124.",
+    "LastCrashDumpInfo зафиксировал BugcheckCode 292 и BugcheckParameter1 0.",
+    "0x124 соответствует WHEA_UNCORRECTABLE_ERROR; Parameter 1 = 0 соответствует Machine Check Exception.",
+    "Перед успешным обновлением были отключены Enhanced Multi-Core Performance и XMP, а CPU VCore возвращён в Auto/Normal.",
+    "Перед финальной перезагрузкой защита Kaspersky была временно отключена."
+  ],
+  "root_cause": {
+    "hardware_fact": "Критическое падение в SafeOS было связано с CPU-origin Machine Check Exception (0x124) при текущей аппаратной/BIOS-конфигурации под нагрузкой.",
+    "software_fact": "Параллельно присутствовал отдельный блокирующий симптом миграции Kaspersky: Access Denied (0x00000005).",
+    "silicon_degradation": "HYPOTHESIS: необратимая деградация кремния процессора отдельно не доказана."
+  },
+  "remediation": [
+    "Отключён Enhanced Multi-Core Performance.",
+    "Отключён XMP.",
+    "CPU VCore возвращён в Auto/Normal.",
+    "Kaspersky protection временно отключена перед финальной перезагрузкой.",
+    "CrashDumpEnabled=7 и AlwaysKeepMemoryDump=1 были включены для точного захвата bugcheck."
+  ],
+  "outcome": [
+    "После двойной ремедиации обновление завершилось успешно."
+  ]
+}
